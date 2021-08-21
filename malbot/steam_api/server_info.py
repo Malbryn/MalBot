@@ -17,6 +17,11 @@ class RCON:
 
         return players
 
+    async def send_global_message(self, context, message):
+        await context.send('Message sent > {}'.format(message))\
+            if await self.__send_message(message=message, player_id=-1)\
+            else await context.send('Failed to send message > {}'.format(message))
+
     async def __rcon_connect(self):
         try:
             rcon_client = bec_rcon.ARC(os.environ['RCON_IP'], os.environ['RCON_PASSWORD'], int(os.environ['RCON_PORT']))
@@ -29,6 +34,13 @@ class RCON:
             self.logger.error('RCON connection failed: ', e)
 
             return None
+
+    def __handle_message(self, args):
+        message = args[0]
+        print(message)
+        self.logger.info(message)
+
+        return None
 
     async def __get_players(self):
         try:
@@ -86,9 +98,17 @@ class RCON:
 
         return profile_names
 
-    def __handle_message(self, args):
-        message = args[0]
-        print(message)
-        self.logger.info(message)
+    async def __send_message(self, message, player_id=-1):
+        try:
+            rcon_client = await self.__rcon_connect()
+            await rcon_client.sayGlobal(message) if player_id == -1 else await rcon_client.sayPlayer(player_id, message)
 
-        return None
+            return True
+        except Exception as e:
+            self.logger.error('Sending RCON message failed: ', e)
+
+            return False
+        finally:
+            rcon_client.disconnect()
+
+            self.logger.info('RCON client disconnected')
