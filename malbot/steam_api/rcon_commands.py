@@ -11,16 +11,25 @@ class RCON:
         self.api_endpoint = api
         self.logger = init_logger()
 
-    async def get_player_list(self):
+    async def get_player_list(self, context):
+        await context.send('Retrieving player list...')
+
         player_steam_ids = await self.__convert_guids(await self.__get_players())
         players = await self.__get_all_names_by_steam_ids(player_steam_ids)
 
-        return players
+        await context.channel.send('Online players: {}'.format(players))
 
     async def send_global_message(self, context, message):
         await context.send('Message sent > {}'.format(message))\
             if await self.__send_message(message=message, player_id=-1)\
             else await context.send('Failed to send message > {}'.format(message))
+
+    def __handle_message(self, args):
+        message = args[0]
+        print(message)
+        self.logger.info(message)
+
+        return None
 
     async def __rcon_connect(self):
         try:
@@ -35,17 +44,11 @@ class RCON:
 
             return None
 
-    def __handle_message(self, args):
-        message = args[0]
-        print(message)
-        self.logger.info(message)
-
-        return None
-
     async def __get_players(self):
         try:
             rcon_client = await self.__rcon_connect()
 
+            print(await rcon_client.getPlayersArray())
             return await rcon_client.getPlayersArray()
         except Exception as e:
             self.logger.error('Getting player list failed: ', e)

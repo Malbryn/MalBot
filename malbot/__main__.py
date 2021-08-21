@@ -6,7 +6,7 @@ from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
 
 from malbot.log import init_logger
-from malbot.steam_api.server_info import RCON
+from malbot.steam_api.rcon_commands import RCON
 
 API_ENDPOINT = 'https://beguid-converter.allianceapps.io/v3'
 
@@ -43,7 +43,7 @@ def main():
         guild_ids=guild_id
     )
     async def player_list(context):
-        await context.send(f'Online players: {await rcon_client.get_player_list()}')
+        await rcon_client.get_player_list(context)
         
     @slash.slash(
         name='send_global_message',
