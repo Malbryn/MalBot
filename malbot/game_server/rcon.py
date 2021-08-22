@@ -15,6 +15,11 @@ class RCON:
         await context.send('Retrieving player list...')
 
         player_steam_ids = await self.__convert_guids(await self.__get_players())
+
+        if not player_steam_ids:
+            await context.channel.send('Nobody is online')
+            return None
+
         players = await self.__get_all_names_by_steam_ids(player_steam_ids)
 
         await context.channel.send('Online players: {}'.format(players))
@@ -48,7 +53,6 @@ class RCON:
         try:
             rcon_client = await self.__rcon_connect()
 
-            print(await rcon_client.getPlayersArray())
             return await rcon_client.getPlayersArray()
         except Exception as e:
             self.logger.error('Getting player list failed: ', e)
@@ -60,6 +64,9 @@ class RCON:
             self.logger.info('RCON client disconnected')
 
     async def __convert_guids(self, all_player_info):
+        if not all_player_info:
+            return None
+
         try:
             guids = '['
 

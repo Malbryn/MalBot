@@ -93,6 +93,14 @@ def main():
             context=context, address=address, password=password, modset=modset
         )
 
+    @slash.slash(
+        name='delete_server_info_panel',
+        description='Delete the server info panel',
+        guild_ids=guild_id
+    )
+    async def delete_server_info_panel(context):
+        await info_panel_builder.delete_server_info_panel(context=context)
+
     client.run(os.environ['DISCORD_TOKEN'])
 
 
