@@ -37,7 +37,7 @@ def main():
 
     @slash.slash(
         name='ping',
-        description='Show the latency of the bot',
+        description='Show the latency of the bot [All]',
         guild_ids=[GUILD_ID],
         permissions={
             GUILD_ID: [
@@ -51,7 +51,7 @@ def main():
 
     @slash.slash(
         name='player_list',
-        description='Get a list of the online players on the DayZ server',
+        description='Get a list of the online players on the DayZ server [All]',
         guild_ids=[GUILD_ID],
         permissions={
             GUILD_ID: [
@@ -65,7 +65,7 @@ def main():
         
     @slash.slash(
         name='send_global_message',
-        description='Send global message to the server',
+        description='Send global message to the server [Admin only]',
         guild_ids=[GUILD_ID],
         permissions={
             GUILD_ID: [
@@ -87,7 +87,7 @@ def main():
 
     @slash.slash(
         name='create_server_info_panel',
-        description='Create a panel for the server info',
+        description='Create a panel for the server info [Admin only]',
         guild_ids=[GUILD_ID],
         permissions={
             GUILD_ID: [
@@ -124,7 +124,7 @@ def main():
 
     @slash.slash(
         name='delete_server_info_panel',
-        description='Delete the server info panel',
+        description='Delete the server info panel [Admin only]',
         guild_ids=[GUILD_ID],
         permissions={
             GUILD_ID: [
@@ -139,7 +139,7 @@ def main():
 
     @slash.slash(
         name='refresh_server_info_panel',
-        description='Refresh the server info panel',
+        description='Refresh the server info panel [Admin only]',
         guild_ids=[GUILD_ID],
         permissions={
             GUILD_ID: [
@@ -154,7 +154,7 @@ def main():
 
     @slash.slash(
         name='reattach_server_info_panel',
-        description='Reattach the server info panel to the bot (if the bot was offline)',
+        description='Reattach the server info panel to the bot (if the bot was offline) [Admin only]',
         guild_ids=[GUILD_ID],
         permissions={
             GUILD_ID: [
@@ -198,7 +198,7 @@ def main():
 
     @slash.slash(
         name='start_server_info_panel',
-        description='Start the server info panel',
+        description='Start the server info panel, after creating or reattaching the info panel [Admin only]',
         guild_ids=[GUILD_ID],
         permissions={
             GUILD_ID: [
@@ -213,7 +213,7 @@ def main():
 
     @slash.slash(
         name='stop_server_info_panel',
-        description='Stop the server info panel',
+        description='Stop the server info panel [Admin only]',
         guild_ids=[GUILD_ID],
         permissions={
             GUILD_ID: [
@@ -223,7 +223,7 @@ def main():
         }
     )
     async def stop_server_info_panel(context):
-        await context.send('Stopped server info panel...', delete_after=5.0)
+        await context.send('Stopping server info panel...', delete_after=5.0)
         await info_panel_builder.stop_server_info_panel(context=context)
 
     client.run(os.environ['DISCORD_TOKEN'])

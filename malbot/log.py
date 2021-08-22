@@ -6,7 +6,6 @@ def init_logger():
     logger = logging.getLogger('discord')
     logger.setLevel(logging.INFO)
 
-    # Check if log folder exists
     parent_path = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     log_path = os.path.join(parent_path, 'logs')
 

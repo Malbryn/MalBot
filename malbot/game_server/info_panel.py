@@ -16,7 +16,7 @@ class InfoPanel:
         self.name = '<unknown>'
         self.address = '<unknown>'
         self.password = '<unknown>'
-        self.modset = ''
+        self.modset = '<unknown>'
 
         self.current_player_count = 999
         self.max_player_count = 999
@@ -124,7 +124,7 @@ class InfoPanel:
             else:
                 return None
 
-    async def stop_server_info_panel(self, context):
+    async def stop_server_info_panel(self):
         self.is_running = False
 
     async def __build_embed(self, context):
