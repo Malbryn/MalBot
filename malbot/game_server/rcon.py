@@ -3,6 +3,8 @@ import bec_rcon
 import requests
 
 from steam.webapi import WebAPI
+
+from malbot.game_server.player import Player
 from malbot.log import init_logger
 
 
@@ -28,6 +30,18 @@ class RCON:
         await context.send('Message sent > {}'.format(message))\
             if await self.__send_message(message=message, player_id=-1)\
             else await context.send('Failed to send message > {}'.format(message))
+
+    async def get_players(self):
+        player_array = await self.__get_players()
+        players = []
+
+        for player in player_array:
+            name = await self.__get_name_by_steam_id(await self.__convert_guid(player[3]))
+            current_player = Player(rcon_id=int(player[0]), name=name, ping=player[2])
+
+            players.append(current_player)
+
+        return players
 
     def __handle_message(self, args):
         message = args[0]
@@ -62,6 +76,18 @@ class RCON:
             rcon_client.disconnect()
 
             self.logger.info('RCON client disconnected')
+
+    async def __convert_guid(self, guid):
+        if not guid:
+            return None
+
+        try:
+            response = requests.get('{}/{}'.format(self.api_endpoint, guid))
+            json = response.json()
+            return json['data']['steamid']
+        except Exception as e:
+            self.logger.error('Converting GUID failed: ', e)
+            return None
 
     async def __convert_guids(self, all_player_info):
         if not all_player_info:

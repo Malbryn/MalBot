@@ -90,7 +90,7 @@ def main():
     )
     async def create_server_info_panel(context, address: str, password: str, modset: str):
         await info_panel_builder.create_server_info_panel(
-            context=context, address=address, password=password, modset=modset
+            context=context, rcon_client=rcon_client, address=address, password=password, modset=modset
         )
 
     @slash.slash(
