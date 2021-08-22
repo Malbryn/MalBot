@@ -41,7 +41,7 @@ def main():
 
     @slash.slash(
         name='player_list',
-        description='Get the number of online players on the DayZ server',
+        description='Get a list of the online players on the DayZ server',
         guild_ids=guild_id
     )
     async def player_list(context):
@@ -100,6 +100,51 @@ def main():
     )
     async def delete_server_info_panel(context):
         await info_panel_builder.delete_server_info_panel(context=context)
+
+    @slash.slash(
+        name='refresh_server_info_panel',
+        description='Refresh the server info panel',
+        guild_ids=guild_id
+    )
+    async def refresh_server_info_panel(context):
+        await info_panel_builder.refresh_server_info_panel(context=context)
+
+    @slash.slash(
+        name='reattach_server_info_panel',
+        description='Reattach the server info panel to the bot (if the bot was offline)',
+        guild_ids=guild_id,
+        options=[
+            create_option(
+                name='message_id',
+                description='Message ID (right click > Copy ID)',
+                option_type=3,
+                required=True
+            ),
+            create_option(
+                name='address',
+                description='IP and port of the server',
+                option_type=3,
+                required=True
+            ),
+            create_option(
+                name='password',
+                description='Password for the server',
+                option_type=3,
+                required=True
+            ),
+            create_option(
+                name='modset',
+                description='Link to the modset for the server',
+                option_type=3,
+                required=True
+            )
+        ]
+    )
+    async def reattach_server_info_panel(context, message_id: int, address: str, password: str, modset: str):
+        await info_panel_builder.reattach_server_info_panel(
+            context=context, rcon_client=rcon_client, message_id=message_id,
+            address=address, password=password, modset=modset
+        )
 
     client.run(os.environ['DISCORD_TOKEN'])
 

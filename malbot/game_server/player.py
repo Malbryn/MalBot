@@ -3,4 +3,4 @@ class Player:
         self.rcon_id = rcon_id
         self.name = name
         self.ping = ping
-        self.duration = '99:99:99'
+        self.duration = ''

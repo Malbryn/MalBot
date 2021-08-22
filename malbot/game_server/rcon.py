@@ -16,7 +16,7 @@ class RCON:
     async def get_player_list(self, context):
         await context.send('Retrieving player list...')
 
-        player_steam_ids = await self.__convert_guids(await self.__get_players())
+        player_steam_ids = await self.__convert_guids(await self.__get_player_array())
 
         if not player_steam_ids:
             await context.channel.send('Nobody is online')
@@ -32,12 +32,14 @@ class RCON:
             else await context.send('Failed to send message > {}'.format(message))
 
     async def get_players(self):
-        player_array = await self.__get_players()
+        player_array = await self.__get_player_array()
+        response = await self.__convert_guids(player_array)
+
         players = []
 
-        for player in player_array:
-            name = await self.__get_name_by_steam_id(await self.__convert_guid(player[3]))
-            current_player = Player(rcon_id=int(player[0]), name=name, ping=player[2])
+        for index, current_player in enumerate(player_array):
+            name = await self.__get_name_by_steam_id(response[index])
+            current_player = Player(rcon_id=int(current_player[0]), name=name, ping=current_player[2])
 
             players.append(current_player)
 
@@ -63,7 +65,7 @@ class RCON:
 
             return None
 
-    async def __get_players(self):
+    async def __get_player_array(self):
         try:
             rcon_client = await self.__rcon_connect()
 

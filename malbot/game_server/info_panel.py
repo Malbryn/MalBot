@@ -34,9 +34,9 @@ class InfoPanel:
 
     async def create_server_info_panel(self, rcon_client, context, address, password, modset):
         if self.message_id:
-            self.logger.warning('Info panel already exist,'
+            self.logger.warning('Info panel already exist, '
                                 'please delete the old one first using /delete_server_info_panel command')
-            await context.send('Info panel already exist,'
+            await context.send('Info panel already exist, '
                                'please delete the old one first using `/delete_server_info_panel` command')
             return None
 
@@ -47,7 +47,6 @@ class InfoPanel:
         self.address = address
         self.password = password
         self.modset = modset
-        self.timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         await self.__build_embed(context=context)
 
@@ -76,9 +75,44 @@ class InfoPanel:
             title='Server Info',
             colour=0x4C91E3
         )
+
         self.message_id = ''
+        self.player_list = ''
 
         await context.send('Deleted info panel', delete_after=5.0)
+
+    async def refresh_server_info_panel(self, context):
+        if not self.message_id:
+            self.logger.warning('Info panel does not exist')
+            await context.send('Info panel does not exist')
+            return None
+
+        await context.send('Refreshing server info panel...', delete_after=5.0)
+
+        await self.__build_embed(self)
+
+        message = await context.channel.fetch_message(self.message_id)
+        await message.edit(embed=self.embed)
+
+    async def reattach_server_info_panel(self, context, rcon_client, message_id, address, password, modset):
+        if self.message_id:
+            self.logger.warning('Info panel is attached, no need to reattach it')
+            await context.send('Info panel is attached, no need to reattach it')
+            return None
+
+        await context.send('Reattaching...', delete_after=5.0)
+
+        self.message_id = int(message_id)
+        self.rcon_client = rcon_client
+
+        self.address = address
+        self.password = password
+        self.modset = modset
+
+        await self.__build_embed(self)
+
+        self.logger.info('Server info panel reattached using ID of {}'.format(self.message_id))
+        await context.send('Message ID updated', delete_after=5.0)
 
     async def __build_embed(self, context):
         self.logger.info('Started building embed')
@@ -140,23 +174,20 @@ class InfoPanel:
 
     async def __init_player_list(self, context):
         try:
-            with valve.source.a2s.ServerQuerier((os.environ['RCON_IP'], int(os.environ['QUERY_PORT']))) as server:
-                player_list = server.players().values['players']
-
-            player_durations = {}
-
-            for current in player_list:
-                index = current.values['index']
-                duration = current.values['duration']
-
-                player_durations[index] = duration
+            self.player_list = ''
 
             players = await self.rcon_client.get_players()
 
-            for player in players:
-                player.duration = time.strftime('%H:%M:%S', time.gmtime(player_durations.get(player.rcon_id)))
+            with valve.source.a2s.ServerQuerier((os.environ['RCON_IP'], int(os.environ['QUERY_PORT']))) as server:
+                all_players = server.players().values['players']
 
-                info = '{}. {} ({}ms) - {}\n'.format(player.rcon_id, player.name, player.ping, player.duration)
+            for i in range(len(players), 0, -1):
+                players[i-1].duration = \
+                    time.strftime('%H:%M:%S', time.gmtime(all_players[len(players) - i].values['duration']))
+
+                info = '{}. {} ({}ms) - {}\n'.format(
+                    players[i-1].rcon_id, players[i-1].name, players[i-1].ping, players[i-1].duration
+                )
                 self.player_list += info
 
             self.embed.add_field(
@@ -170,6 +201,8 @@ class InfoPanel:
 
     async def __init_footer(self, context):
         try:
+            self.timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
             self.embed.set_footer(
                 text='Last updated: {}'.format(self.timestamp),
                 icon_url='https://probot.media/tUE1WGMdwV.png'
@@ -177,9 +210,3 @@ class InfoPanel:
         except Exception as e:
             self.logger.error('Creating Timestamp failed: ', e)
             await context.channel.send('Creating Timestamp field failed: ', e)
-
-    # async def __update_player_fields(self, context, rcon_client):
-    #
-    #
-    #     message = await context.channel.fetch_message(self.message_id)
-    #     await message.edit(embed=self.embed)
