@@ -1,3 +1,4 @@
+import asyncio
 import os
 import discord
 import valve.source.a2s
@@ -32,15 +33,17 @@ class InfoPanel:
 
         self.logger = init_logger()
 
+        self.is_running = False
+        self.refresh_rate = 120
+
     async def create_server_info_panel(self, rcon_client, context, address, password, modset):
         if self.message_id:
             self.logger.warning('Info panel already exist, '
                                 'please delete the old one first using /delete_server_info_panel command')
-            await context.send('Info panel already exist, '
-                               'please delete the old one first using `/delete_server_info_panel` command')
+            await context.channel.send('Info panel already exist, '
+                                       'please delete the old one first using `/delete_server_info_panel` command',
+                                       delete_after=5.0)
             return None
-
-        await context.send('Building server info panel...', delete_after=5.0)
 
         self.rcon_client = rcon_client
 
@@ -55,12 +58,12 @@ class InfoPanel:
             self.message_id = message.id
         except Exception as e:
             self.logger.error('Creating server info embed failed: ', e)
-            await context.channel.send('Creating server info embed failed: ', e)
+            await context.channel.send(f'Creating server info embed failed: {e}', delete_after=5.0)
 
     async def delete_server_info_panel(self, context):
         if not self.message_id:
             self.logger.warning('Info panel does not exist')
-            await context.send('Info panel does not exist')
+            await context.channel.send('Info panel does not exist', delete_after=5.0)
             return None
 
         try:
@@ -68,7 +71,7 @@ class InfoPanel:
             await message.delete()
         except Exception as e:
             self.logger.error('Deleting info panel failed: ', e)
-            await context.send('Deleting info panel failed: {}'.format(e))
+            await context.channel.send(f'Deleting info panel failed: {e}', delete_after=5.0)
             return None
 
         self.embed = discord.Embed(
@@ -78,16 +81,15 @@ class InfoPanel:
 
         self.message_id = ''
         self.player_list = ''
+        self.is_running = False
 
-        await context.send('Deleted info panel', delete_after=5.0)
+        await context.channel.send('Deleted info panel', delete_after=5.0)
 
     async def refresh_server_info_panel(self, context):
         if not self.message_id:
             self.logger.warning('Info panel does not exist')
-            await context.send('Info panel does not exist')
+            await context.channel.send('Info panel does not exist', delete_after=5.0)
             return None
-
-        await context.send('Refreshing server info panel...', delete_after=5.0)
 
         await self.__build_embed(self)
 
@@ -97,10 +99,8 @@ class InfoPanel:
     async def reattach_server_info_panel(self, context, rcon_client, message_id, address, password, modset):
         if self.message_id:
             self.logger.warning('Info panel is attached, no need to reattach it')
-            await context.send('Info panel is attached, no need to reattach it')
+            await context.channel.send('Info panel is attached, no need to reattach it', delete_after=5.0)
             return None
-
-        await context.send('Reattaching...', delete_after=5.0)
 
         self.message_id = int(message_id)
         self.rcon_client = rcon_client
@@ -112,7 +112,20 @@ class InfoPanel:
         await self.__build_embed(self)
 
         self.logger.info('Server info panel reattached using ID of {}'.format(self.message_id))
-        await context.send('Message ID updated', delete_after=5.0)
+        await context.channel.send('Message ID updated', delete_after=5.0)
+
+    async def start_server_info_panel(self, context):
+        self.is_running = True
+
+        while True:
+            if self.is_running:
+                await self.refresh_server_info_panel(context)
+                await asyncio.sleep(self.refresh_rate)
+            else:
+                return None
+
+    async def stop_server_info_panel(self, context):
+        self.is_running = False
 
     async def __build_embed(self, context):
         self.logger.info('Started building embed')
