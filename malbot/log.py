@@ -23,8 +23,11 @@ def init_logger():
     #     except Exception as e:
     #         print('Cannot create log file: ', e)
 
-    os.mkdir('/app/logs')
-    Path('/app/logs/discord.log').touch()
+    if not os.path.isdir('/app/logs'):
+        os.mkdir('/app/logs')
+
+    if not os.path.isfile('/app/logs/discord.log'):
+        Path('/app/logs/discord.log').touch()
 
     handler = logging.FileHandler(filename='/app/logs/discord.log', encoding='utf-8', mode='w')
     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
