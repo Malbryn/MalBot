@@ -1,5 +1,6 @@
 import os
 import logging
+from pathlib import Path
 
 
 def init_logger():
@@ -15,6 +16,12 @@ def init_logger():
             print('Log directory created: ', parent_path)
         except OSError as e:
             print('Cannot create log directory: ', e)
+
+    if not os.path.isfile(os.path.join(log_path, 'discord.log')):
+        try:
+            Path(os.path.join(log_path, 'discord.log')).touch()
+        except Exception as e:
+            print('Cannot create log file: ', e)
 
     handler = logging.FileHandler(filename=log_path + '/discord.log', encoding='utf-8', mode='w')
     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
