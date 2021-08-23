@@ -23,6 +23,7 @@ def init_logger():
     #     except Exception as e:
     #         print('Cannot create log file: ', e)
 
+    os.mkdir('/app/logs')
     Path('/app/logs/discord.log').touch()
 
     handler = logging.FileHandler(filename='/app/logs/discord.log', encoding='utf-8', mode='w')
