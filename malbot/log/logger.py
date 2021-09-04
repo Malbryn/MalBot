@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 
 
-def init_logger():
+def init():
     logger = logging.getLogger('discord')
     logger.setLevel(logging.INFO)
 
