@@ -5,13 +5,11 @@ import requests
 from steam.webapi import WebAPI
 
 from malbot.game_server.player import Player
-from malbot.log import init_logger
 
 
 class RCON:
     def __init__(self, api):
         self.api_endpoint = api
-        self.logger = init_logger()
 
     async def get_player_list(self, context):
         await context.send('Retrieving player list...')
@@ -48,7 +46,6 @@ class RCON:
     def __handle_message(self, args):
         message = args[0]
         print(message)
-        self.logger.info(message)
 
         return None
 
@@ -57,11 +54,11 @@ class RCON:
             rcon_client = bec_rcon.ARC(os.environ['RCON_IP'], os.environ['RCON_PASSWORD'], int(os.environ['RCON_PORT']))
             rcon_client.add_Event('received_ServerMessage', self.__handle_message)
 
-            self.logger.info('RCON connection successful')
+            print('RCON connection successful')
 
             return rcon_client
         except Exception as e:
-            self.logger.error('RCON connection failed: ', e)
+            print('RCON connection failed: ', e)
 
             return None
 
@@ -71,13 +68,13 @@ class RCON:
 
             return await rcon_client.getPlayersArray()
         except Exception as e:
-            self.logger.error('Getting player list failed: ', e)
+            print('Getting player list failed: ', e)
 
             return []
         finally:
             rcon_client.disconnect()
 
-            self.logger.info('RCON client disconnected')
+            print('RCON client disconnected')
 
     async def __convert_guid(self, guid):
         if not guid:
@@ -88,7 +85,7 @@ class RCON:
             json = response.json()
             return json['data']['steamid']
         except Exception as e:
-            self.logger.error('Converting GUID failed: ', e)
+            print('Converting GUID failed: ', e)
             return None
 
     async def __convert_guids(self, all_player_info):
@@ -107,7 +104,8 @@ class RCON:
             response = requests.post(url=self.api_endpoint, data=guids)
             json = response.json()
         except Exception as e:
-            self.logger.error('Converting GUID\'s failed: ', e)
+            print('Converting GUID\'s failed: ', e)
+
             return None
 
         steam_ids = []
@@ -123,7 +121,8 @@ class RCON:
             api.ISteamUser.GetPlayerSummaries(steamids=steam_id)
             response = api.call('ISteamUser.GetPlayerSummaries', steamids=steam_id)
         except Exception as e:
-            self.logger.error('Getting Steam profile name failed: ', e)
+            print('Getting Steam profile name failed: ', e)
+
             return None
 
         return response['response']['players'][0]['personaname']
@@ -143,10 +142,10 @@ class RCON:
 
             return True
         except Exception as e:
-            self.logger.error('Sending RCON message failed: ', e)
+            print('Sending RCON message failed: ', e)
 
             return False
         finally:
             rcon_client.disconnect()
 
-            self.logger.info('RCON client disconnected')
+            print('RCON client disconnected')

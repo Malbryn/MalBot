@@ -6,8 +6,6 @@ import time
 
 from datetime import datetime
 
-from malbot.log import init_logger
-
 
 class InfoPanel:
     def __init__(self):
@@ -31,15 +29,11 @@ class InfoPanel:
             colour=0x4C91E3
         )
 
-        self.logger = init_logger()
-
         self.is_running = False
         self.refresh_rate = 120
 
     async def create_server_info_panel(self, rcon_client, context, address, password, modset):
         if self.message_id:
-            self.logger.warning('Info panel already exist, '
-                                'please delete the old one first using /delete_server_info_panel command')
             await context.channel.send('Info panel already exist, '
                                        'please delete the old one first using `/delete_server_info_panel` command',
                                        delete_after=5.0)
@@ -57,12 +51,12 @@ class InfoPanel:
             message = await context.channel.send(embed=self.embed)
             self.message_id = message.id
         except Exception as e:
-            self.logger.error('Creating server info embed failed: ', e)
+            print('Creating server info embed failed: ', e)
             await context.channel.send(f'Creating server info embed failed: {e}', delete_after=5.0)
 
     async def delete_server_info_panel(self, context):
         if not self.message_id:
-            self.logger.warning('Info panel does not exist')
+            print('Info panel does not exist')
             await context.channel.send('Info panel does not exist', delete_after=5.0)
             return None
 
@@ -70,7 +64,7 @@ class InfoPanel:
             message = await context.channel.fetch_message(self.message_id)
             await message.delete()
         except Exception as e:
-            self.logger.error('Deleting info panel failed: ', e)
+            print('Deleting info panel failed: ', e)
             await context.channel.send(f'Deleting info panel failed: {e}', delete_after=5.0)
             return None
 
@@ -87,7 +81,7 @@ class InfoPanel:
 
     async def refresh_server_info_panel(self, context):
         if not self.message_id:
-            self.logger.warning('Info panel does not exist')
+            print('Info panel does not exist')
             await context.channel.send('Info panel does not exist', delete_after=5.0)
             return None
 
@@ -98,7 +92,7 @@ class InfoPanel:
 
     async def reattach_server_info_panel(self, context, rcon_client, message_id, address, password, modset):
         if self.message_id:
-            self.logger.warning('Info panel is attached, no need to reattach it')
+            print('Info panel is attached, no need to reattach it')
             await context.channel.send('Info panel is attached, no need to reattach it', delete_after=5.0)
             return None
 
@@ -111,7 +105,7 @@ class InfoPanel:
 
         await self.__build_embed(self)
 
-        self.logger.info('Server info panel reattached using ID of {}'.format(self.message_id))
+        print('Server info panel reattached using ID of {}'.format(self.message_id))
         await context.channel.send('Message ID updated', delete_after=5.0)
 
     async def start_server_info_panel(self, context):
@@ -128,7 +122,7 @@ class InfoPanel:
         self.is_running = False
 
     async def __build_embed(self, context):
-        self.logger.info('Started building embed')
+        print('Started building embed')
 
         self.embed = discord.Embed(
             title='Server Info',
@@ -141,7 +135,7 @@ class InfoPanel:
         await self.__init_player_list(context=context)
         await self.__init_footer(context=context)
 
-        self.logger.info('Finished building embed')
+        print('Finished building embed')
 
     async def __init_details(self, context):
         with valve.source.a2s.ServerQuerier((os.environ['RCON_IP'], int(os.environ['QUERY_PORT']))) as server:
@@ -156,7 +150,7 @@ class InfoPanel:
                 inline=False
             )
         except Exception as e:
-            self.logger.error('Creating Details field failed: ', e)
+            print('Creating Details field failed: ', e)
             await context.channel.send('Creating Details field failed: ', e)
 
     async def __init_player_count(self, context):
@@ -171,7 +165,7 @@ class InfoPanel:
                 inline=False
             )
         except Exception as e:
-            self.logger.error('Creating Player count field failed: ', e)
+            print('Creating Player count field failed: ', e)
             await context.channel.send('Creating Player field count failed: ', e)
 
     async def __init_modset(self, context):
@@ -182,7 +176,7 @@ class InfoPanel:
                 inline=False
             )
         except Exception as e:
-            self.logger.error('Creating Modset field failed: ', e)
+            print('Creating Modset field failed: ', e)
             await context.channel.send('Creating Modset field failed: ', e)
 
     async def __init_player_list(self, context):
@@ -210,7 +204,7 @@ class InfoPanel:
                 inline=False
             )
         except Exception as e:
-            self.logger.error('Creating Player list field failed: ', e)
+            print('Creating Player list field failed: ', e)
             await context.channel.send('Creating Player list field failed: ', e)
 
     async def __init_footer(self, context):
@@ -222,5 +216,5 @@ class InfoPanel:
                 icon_url='https://probot.media/tUE1WGMdwV.png'
             )
         except Exception as e:
-            self.logger.error('Creating Timestamp failed: ', e)
+            print('Creating Timestamp failed: ', e)
             await context.channel.send('Creating Timestamp field failed: ', e)
