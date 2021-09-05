@@ -5,6 +5,7 @@ from discord.ext import commands as discord_commands
 from discord_slash import SlashCommand
 
 from malbot.common.commands import CommonCommands
+from malbot.database.database import Database
 from malbot.game_server.commands import GameServerCommands
 from malbot.game_server.info_panel import InfoPanel
 from malbot.game_server.rcon import RCON
@@ -12,6 +13,10 @@ from malbot.game_server.rcon import RCON
 
 def run():
     print('Starting...')
+
+    # Connect to database
+    database = Database()
+    database.connect()
 
     # Set up client
     intents = discord.Intents.all()
