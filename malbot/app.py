@@ -12,11 +12,10 @@ from malbot.game_server.rcon import RCON
 
 
 def run():
-    print('Starting...')
+    print('Starting bot...')
 
-    # Connect to database
+    # Init database
     database = Database()
-    database.connect()
 
     # Set up client
     intents = discord.Intents.all()
@@ -24,7 +23,8 @@ def run():
 
     # Set up game server tools
     rcon_client = RCON(api=os.environ['API_ENDPOINT'])
-    info_panel_builder = InfoPanel()
+
+    info_panel_builder = InfoPanel(db=database, rcon_client=rcon_client)
 
     # Init slash commands
     command = SlashCommand(client, sync_commands=True)

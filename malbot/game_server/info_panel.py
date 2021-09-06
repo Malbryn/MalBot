@@ -6,24 +6,24 @@ import time
 
 from datetime import datetime
 
+from malbot.database.database import Database
+from malbot.game_server.rcon import RCON
+
 
 class InfoPanel:
-    def __init__(self):
+    def __init__(self, db: Database, rcon_client: RCON):
         self.rcon_client = None
 
         self.name = '<unknown>'
         self.address = '<unknown>'
         self.password = '<unknown>'
         self.modset = '<unknown>'
-
         self.current_player_count = 999
         self.max_player_count = 999
-
         self.player_list = ''
-
         self.timestamp = ''
-
         self.message_id = ''
+
         self.embed = discord.Embed(
             title='Server Info',
             colour=0x4C91E3
@@ -31,6 +31,31 @@ class InfoPanel:
 
         self.is_running = False
         self.refresh_rate = 120
+
+        self.fetch_data(db=db, rcon_client=rcon_client)
+
+    def fetch_data(self, db: Database, rcon_client: RCON) -> None:
+        print('Fetching data from database...')
+
+        try:
+            db.connect()
+
+            data = db.query('SELECT * FROM game_server')
+
+            self.rcon_client = rcon_client
+
+            self.message_id = int(data[1])
+            self.address = data[3]
+            self.password = data[4]
+            self.modset = data[5]
+
+            self.__build_embed(self)
+
+            print('Server info panel reattached using ID of {}'.format(self.message_id))
+        except Exception as e:
+            print('Unable to fetch data from database: ', e)
+        finally:
+            db.disconnect()
 
     async def create_server_info_panel(self, rcon_client, context, address, password, modset):
         if self.message_id:

@@ -11,7 +11,7 @@ class Database:
         self.cursor = None
         self.db_version = None
 
-    def connect(self):
+    def connect(self) -> None:
         print('Connecting to PostgreSQL database...')
 
         try:
@@ -24,10 +24,21 @@ class Database:
         except Exception as e:
             print('Connection to database failed: ', e)
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         print('Disconnecting from PostgreSQL database...')
 
         try:
             self.cursor.close()
         except Exception as e:
             print('Disconnecting failed: ', e)
+
+    def query(self, query_string: str) -> list:
+        data = []
+
+        try:
+            self.cursor.execute(query_string)
+            data = self.cursor.fetchone()
+        except Exception as e:
+            print('Query failed: ', e)
+        finally:
+            return data
