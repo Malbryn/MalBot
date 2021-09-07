@@ -30,10 +30,11 @@ class CommonCommands(Commands):
             }
         )
         async def ping(context):
+            print('PING')
             await context.send(f'Latency: {round(self.client.latency * 1000)}ms')
 
         @self.command.slash(
-            name='help',
+            name='help2',
             description='Show a list of the available commands [All]',
             guild_ids=[GUILD_ID],
             permissions={

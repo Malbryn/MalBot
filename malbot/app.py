@@ -11,38 +11,54 @@ from malbot.game_server.info_panel import InfoPanel
 from malbot.game_server.rcon import RCON
 
 
-def run():
-    print('Starting bot...')
+class App(discord.Client):
+    def __init__(self, *args, **kwargs):
+        print('Starting bot...')
 
-    # Init database
-    database = Database()
+        super().__init__(*args, **kwargs)
 
-    # Set up client
-    intents = discord.Intents.all()
-    client = discord_commands.Bot(command_prefix='!', intents=intents)
+        # Init database
+        self.database = Database()
 
-    # Set up game server tools
-    rcon_client = RCON(api=os.environ['API_ENDPOINT'])
+        # Set up client
+        intents = discord.Intents.all()
+        self.client = discord_commands.Bot(command_prefix='!', intents=intents)
 
-    info_panel_builder = InfoPanel(db=database, rcon_client=rcon_client)
+        # Set up game server tools
+        self.rcon_client = RCON(api=os.environ['API_ENDPOINT'])
+        self.info_panel = InfoPanel()
+        self.loop.create_task(self.init_info_panel())
 
-    # Init slash commands
-    command = SlashCommand(client, sync_commands=True)
-    CommonCommands(
-        client=client,
-        command=command
-    ).init()
-    GameServerCommands(
-        client=client,
-        command=command,
-        rcon_client=rcon_client,
-        info_panel_builder=info_panel_builder
-    ).init()
+        # Init slash commands
+        self.command = SlashCommand(client=self.client, sync_commands=True)
+        self.init_commands()
 
-    @client.event
-    async def on_ready():
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='Bottom Gear'))
+        # Start background tasks
+        self.task = self.loop.create_task(self.info_panel.start_monitoring(client=self.client))
 
-        print('Logged in as {0.user}'.format(client))
+    async def on_ready(self):
+        await self.change_presence(
+            activity=discord.Activity(type=discord.ActivityType.watching, name='Bottom Gear')
+        )
 
-    client.run(os.environ['DISCORD_TOKEN'])
+        print(f'Logged in as {self.user} (ID: {self.user.id})')
+        print('---------------')
+
+    async def init_info_panel(self):
+        print('Initialising info panel...')
+
+        await self.info_panel.fetch_data(db=self.database, rcon_client=self.rcon_client)
+
+    def init_commands(self):
+        print('Initialising user commands...')
+
+        CommonCommands(
+            client=self.client.user,
+            command=self.command
+        ).init()
+        GameServerCommands(
+            client=self.client,
+            command=self.command,
+            rcon_client=self.rcon_client,
+            info_panel=self.info_panel
+        ).init()
