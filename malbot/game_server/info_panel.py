@@ -33,7 +33,7 @@ class InfoPanel:
             colour=0x4C91E3
         )
 
-        self.refresh_rate = 5  # Seconds
+        self.refresh_rate = 120  # Seconds
 
     async def fetch_data(self, db: Database, rcon_client: RCON) -> None:
         print('Fetching data from database...')
@@ -141,10 +141,8 @@ class InfoPanel:
 
         await client.wait_until_ready()
         while not client.is_closed():
-            # await self.refresh(client=client)
-            # await asyncio.sleep(self.refresh_rate)
-            print('*** TEST ***')
-            await asyncio.sleep(5)
+            await self.refresh(client=client)
+            await asyncio.sleep(self.refresh_rate)
 
     async def stop_monitoring(self) -> None:
         print('Stopping game server monitoring...')

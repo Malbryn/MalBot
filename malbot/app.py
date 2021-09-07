@@ -27,14 +27,13 @@ class App(discord.Client):
         # Set up game server tools
         self.rcon_client = RCON(api=os.environ['API_ENDPOINT'])
         self.info_panel = InfoPanel()
-        self.loop.create_task(self.init_info_panel())
 
         # Init slash commands
-        self.command = SlashCommand(client=self.client, sync_commands=True)
+        self.command = SlashCommand(client=self, sync_commands=True)
         self.init_commands()
 
-        # Start background tasks
-        self.task = self.loop.create_task(self.info_panel.start_monitoring(client=self.client))
+        # Background tasks
+        self.loop.create_task(self.init_info_panel())
 
     async def on_ready(self):
         await self.change_presence(
@@ -48,16 +47,17 @@ class App(discord.Client):
         print('Initialising info panel...')
 
         await self.info_panel.fetch_data(db=self.database, rcon_client=self.rcon_client)
+        await self.loop.create_task(self.info_panel.start_monitoring(client=self))
 
     def init_commands(self):
         print('Initialising user commands...')
 
         CommonCommands(
-            client=self.client.user,
+            client=self,
             command=self.command
         ).init()
         GameServerCommands(
-            client=self.client,
+            client=self,
             command=self.command,
             rcon_client=self.rcon_client,
             info_panel=self.info_panel

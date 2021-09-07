@@ -1,6 +1,6 @@
 import os
 
-from discord.ext.commands import Bot
+from discord import Client
 from discord_slash import SlashCommand
 from discord_slash.model import SlashCommandPermissionType
 from discord_slash.utils.manage_commands import create_permission
@@ -13,7 +13,7 @@ ROLE_ID_ADMIN = int(os.environ['ROLE_ID_ADMIN'])
 
 
 class CommonCommands(Commands):
-    def __init__(self, client: Bot, command: SlashCommand):
+    def __init__(self, client: Client, command: SlashCommand):
         super().__init__(name='Common', client=client, command=command)
 
     def init(self) -> None:
@@ -30,11 +30,10 @@ class CommonCommands(Commands):
             }
         )
         async def ping(context):
-            print('PING')
             await context.send(f'Latency: {round(self.client.latency * 1000)}ms')
 
         @self.command.slash(
-            name='help2',
+            name='help',
             description='Show a list of the available commands [All]',
             guild_ids=[GUILD_ID],
             permissions={
@@ -45,4 +44,4 @@ class CommonCommands(Commands):
             }
         )
         async def help(context):
-            await context.send('NOT YET IMPLEMENTED')  # TODO: Implement this
+            await context.send('Not yet implemented')  # TODO: Implement this

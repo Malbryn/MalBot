@@ -1,6 +1,6 @@
 import os
 
-from discord.ext.commands import Bot
+from discord import Client
 from discord_slash import SlashCommand
 from discord_slash.model import SlashCommandPermissionType
 from discord_slash.utils.manage_commands import create_permission, create_option
@@ -15,8 +15,9 @@ ROLE_ID_ADMIN = int(os.environ['ROLE_ID_ADMIN'])
 
 
 class GameServerCommands(Commands):
-    def __init__(self, client: Bot, command: SlashCommand, rcon_client: RCON, info_panel: InfoPanel):
+    def __init__(self, client: Client, command: SlashCommand, rcon_client: RCON, info_panel: InfoPanel):
         super().__init__(name='Game Server', client=client, command=command)
+
         self.rcon_client = rcon_client
         self.info_panel = info_panel
 
@@ -24,7 +25,7 @@ class GameServerCommands(Commands):
         """Initialises the Game Server commands"""
         @self.command.slash(
             name='player_list',
-            description='Get a list of the online players on the DayZ server [All]',
+            description='Get a list of the online players on the server [All]',
             guild_ids=[GUILD_ID],
             permissions={
                 GUILD_ID: [
