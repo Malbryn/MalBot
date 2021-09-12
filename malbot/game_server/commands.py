@@ -124,7 +124,7 @@ class GameServerCommands(Commands):
         )
         async def start_server_info_panel(context):
             await context.send('Starting server info panel...', delete_after=5.0)
-            await self.client.loop.create_task(self.info_panel.start_monitoring(context=context))
+            await self.client.loop.create_task(self.info_panel.start_monitoring(client=self.client))
 
         @self.command.slash(
             name='stop_server_info_panel',

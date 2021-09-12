@@ -47,7 +47,9 @@ class App(discord.Client):
         print('Initialising info panel...')
 
         await self.info_panel.fetch_data()
-        await self.loop.create_task(self.info_panel.start_monitoring(client=self))
+
+        if self.info_panel.message_id:
+            await self.loop.create_task(self.info_panel.start_monitoring(client=self))
 
     def init_commands(self):
         print('Initialising user commands...')

@@ -38,6 +38,7 @@ class InfoPanel:
         )
 
         self.refresh_rate = 120  # Seconds
+        self.cancel_task = False
 
     async def fetch_data(self) -> None:
         print('Fetching data from database...')
@@ -45,7 +46,11 @@ class InfoPanel:
         try:
             await self.database.connect()
 
-            data = await self.database.query('SELECT * FROM game_server WHERE id=1')
+            data = await self.database.query('SELECT * FROM game_server FETCH FIRST ROW ONLY')
+
+            print(data)
+            if not data:
+                raise Exception("The 'game_server' table doesn't contain any data")
 
             self.guild_id = int(data[1])
             self.channel_id = int(data[2])
@@ -56,7 +61,7 @@ class InfoPanel:
 
             print('Server info panel reattached using ID of {}'.format(self.message_id))
 
-            await self.__build_embed(self)
+            await self.__build_embed()
         except Exception as e:
             print('Unable to fetch data from database: ', e)
         finally:
@@ -78,9 +83,9 @@ class InfoPanel:
 
             message = await context.channel.send(embed=self.embed)
 
-            self.message_id = message.id
-            self.guild_id = context.guild.id
-            self.channel_id = context.channel.id
+            self.message_id = int(message.id)
+            self.guild_id = int(context.guild.id)
+            self.channel_id = int(context.channel.id)
 
             await self.database.connect()
             await self.database.query(
@@ -89,7 +94,11 @@ class InfoPanel:
                 (guild_id, channel_id, message_id, address, password, modset)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """,
-                (self.guild_id, self.channel_id, self.message_id, address, password, modset))
+                (self.guild_id, self.channel_id, self.message_id, address, password, modset)
+            )
+
+            print('Info panel created')
+            await context.channel.send('Info panel created', delete_after=5.0)
         except Exception as e:
             print('Creating server info embed failed: ', e)
             await context.channel.send(f'Creating server info embed failed: {e}', delete_after=5.0)
@@ -105,7 +114,16 @@ class InfoPanel:
             await message.delete()
 
             await self.database.connect()
-            await self.database.query('DELETE FROM game_server WHERE message_id={}'.format(self.message_id))
+            await self.database.query(
+                """
+                DELETE FROM game_server
+                WHERE message_id=%s
+                """,
+                [self.message_id]
+            )
+
+            print('Info panel deleted')
+            await context.channel.send('Info panel deleted', delete_after=5.0)
         except Exception as e:
             print('Deleting info panel failed: ', e)
             await context.channel.send(f'Deleting info panel failed: {e}', delete_after=5.0)
@@ -124,14 +142,19 @@ class InfoPanel:
     async def start_monitoring(self, client: Client) -> None:
         print('Starting game server monitoring...')
 
+        self.cancel_task = False
+
         await client.wait_until_ready()
-        while not client.is_closed():
+        while not (client.is_closed() or self.cancel_task):
             await self.refresh(client=client)
             await asyncio.sleep(self.refresh_rate)
 
-    # TODO: implement this
+        print('Game server monitoring stopped')
+
     async def stop_monitoring(self) -> None:
         print('Stopping game server monitoring...')
+
+        self.cancel_task = True
 
     async def refresh(self, **kwargs) -> None:
         context = kwargs.get('context', None)
@@ -148,7 +171,7 @@ class InfoPanel:
 
             return None
 
-        await self.__build_embed(self)
+        await self.__build_embed()
 
         try:
             channel = context.channel if context else client.get_channel(self.channel_id)
@@ -167,21 +190,7 @@ class InfoPanel:
 
             return None
 
-    # TODO: is this still needed?
-    async def __reattach(self) -> None:
-        print('Attempting to reattach to server info panel...')
-
-        if not (self.guild_id and self.channel_id and self.message_id):
-            print('Cannot reattach to server info panel with the following ID\'s:')
-            print('GUILD_ID = {}, CHANNEL_ID = {}, MESSAGE_ID = {}'
-                  .format(self.guild_id, self.channel_id, self.message_id))
-            return None
-
-        await self.__build_embed(self)
-
-        print('Server info panel reattached using message ID of {}'.format(self.message_id))
-
-    async def __build_embed(self, context) -> None:
+    async def __build_embed(self, context: Context = None) -> None:
         print('Building embed for the server info panel...')
 
         self.embed = discord.Embed(
@@ -197,7 +206,7 @@ class InfoPanel:
 
         print('Finished building embed')
 
-    async def __init_details(self, context):
+    async def __init_details(self, context: Context) -> None:
         with valve.source.a2s.ServerQuerier((os.environ['RCON_IP'], int(os.environ['QUERY_PORT']))) as server:
             self.name = server.info().values['server_name']
 
@@ -211,9 +220,11 @@ class InfoPanel:
             )
         except Exception as e:
             print('Creating Details field failed: ', e)
-            await context.channel.send('Creating Details field failed: ', e)
 
-    async def __init_player_count(self, context):
+            if context:
+                await context.channel.send('Creating Details field failed: ', e)
+
+    async def __init_player_count(self, context: Context) -> None:
         try:
             with valve.source.a2s.ServerQuerier((os.environ['RCON_IP'], int(os.environ['QUERY_PORT']))) as server:
                 self.max_player_count = server.info().values['max_players']
@@ -226,9 +237,11 @@ class InfoPanel:
             )
         except Exception as e:
             print('Creating Player count field failed: ', e)
-            await context.channel.send('Creating Player field count failed: ', e)
 
-    async def __init_modset(self, context):
+            if context:
+                await context.channel.send('Creating Player field count failed: ', e)
+
+    async def __init_modset(self, context: Context) -> None:
         try:
             self.embed.add_field(
                 name='Modset',
@@ -237,9 +250,11 @@ class InfoPanel:
             )
         except Exception as e:
             print('Creating Modset field failed: ', e)
-            await context.channel.send('Creating Modset field failed: ', e)
 
-    async def __init_player_list(self, context):
+            if context:
+                await context.channel.send('Creating Modset field failed: ', e)
+
+    async def __init_player_list(self, context: Context) -> None:
         try:
             self.player_list = ''
 
@@ -265,9 +280,11 @@ class InfoPanel:
             )
         except Exception as e:
             print('Creating Player list field failed: ', e)
-            await context.channel.send('Creating Player list field failed: ', e)
 
-    async def __init_footer(self, context):
+            if context:
+                await context.channel.send('Creating Player list field failed: ', e)
+
+    async def __init_footer(self, context: Context) -> None:
         try:
             self.timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -277,4 +294,6 @@ class InfoPanel:
             )
         except Exception as e:
             print('Creating Timestamp failed: ', e)
-            await context.channel.send('Creating Timestamp field failed: ', e)
+
+            if context:
+                await context.channel.send('Creating Timestamp field failed: ', e)

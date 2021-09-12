@@ -28,11 +28,16 @@ class Database:
             print('Disconnecting failed: ', e)
 
     async def query(self, query_string: str, *args) -> list:
+        print('Executing query...')
+
         data = tuple()
 
         try:
             self.cursor.execute(query_string, *args)
-            data = self.cursor.fetchone()
+            if self.cursor.statusmessage == "SELECT 1":
+                data = self.cursor.fetchone()
+
+            self.connection.commit()
         except Exception as e:
             print('Query failed: ', e)
         finally:
