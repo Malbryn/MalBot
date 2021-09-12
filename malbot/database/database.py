@@ -9,22 +9,17 @@ class Database:
 
         self.connection = None
         self.cursor = None
-        self.db_version = None
 
-    def connect(self) -> None:
+    async def connect(self) -> None:
         print('Connecting to PostgreSQL database...')
 
         try:
             self.connection = psycopg2.connect(self.conninfo)
             self.cursor = self.connection.cursor()
-
-            self.cursor.execute('SELECT version()')
-            self.db_version = self.cursor.fetchone()
-            print('PostgreSQL version: ', self.db_version)
         except Exception as e:
             print('Connection to database failed: ', e)
 
-    def disconnect(self) -> None:
+    async def disconnect(self) -> None:
         print('Disconnecting from PostgreSQL database...')
 
         try:
@@ -32,11 +27,11 @@ class Database:
         except Exception as e:
             print('Disconnecting failed: ', e)
 
-    def query(self, query_string: str) -> list:
-        data = []
+    async def query(self, query_string: str, *args) -> list:
+        data = tuple()
 
         try:
-            self.cursor.execute(query_string)
+            self.cursor.execute(query_string, *args)
             data = self.cursor.fetchone()
         except Exception as e:
             print('Query failed: ', e)

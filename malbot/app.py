@@ -17,16 +17,16 @@ class App(discord.Client):
 
         super().__init__(*args, **kwargs)
 
-        # Init database
-        self.database = Database()
-
         # Set up client
         intents = discord.Intents.all()
         self.client = discord_commands.Bot(command_prefix='!', intents=intents)
 
+        # Init database
+        self.database = Database()
+
         # Set up game server tools
         self.rcon_client = RCON(api=os.environ['API_ENDPOINT'])
-        self.info_panel = InfoPanel()
+        self.info_panel = InfoPanel(database=self.database, rcon_client=self.rcon_client)
 
         # Init slash commands
         self.command = SlashCommand(client=self, sync_commands=True)
@@ -46,7 +46,7 @@ class App(discord.Client):
     async def init_info_panel(self):
         print('Initialising info panel...')
 
-        await self.info_panel.fetch_data(db=self.database, rcon_client=self.rcon_client)
+        await self.info_panel.fetch_data()
         await self.loop.create_task(self.info_panel.start_monitoring(client=self))
 
     def init_commands(self):

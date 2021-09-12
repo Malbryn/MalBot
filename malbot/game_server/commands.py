@@ -92,8 +92,8 @@ class GameServerCommands(Commands):
         )
         async def create_server_info_panel(context, address: str, password: str, modset: str) -> None:
             await context.send('Creating server info panel...', delete_after=5.0)
-            await self.info_panel.create(
-                context=context, rcon_client=self.rcon_client, address=address, password=password, modset=modset
+            await self.info_panel.create_embed(
+                context=context, address=address, password=password, modset=modset
             )
 
         @self.command.slash(
@@ -109,22 +109,7 @@ class GameServerCommands(Commands):
         )
         async def delete_server_info_panel(context) -> None:
             await context.send('Deleting server info panel...', delete_after=5.0)
-            await self.info_panel.delete(context=context)
-
-        @self.command.slash(
-            name='refresh_server_info_panel',
-            description='Refresh the server info panel [Admin only]',
-            guild_ids=[GUILD_ID],
-            permissions={
-                GUILD_ID: [
-                    create_permission(ROLE_ID_EVERYONE, SlashCommandPermissionType.ROLE, False),
-                    create_permission(ROLE_ID_ADMIN, SlashCommandPermissionType.ROLE, True)
-                ]
-            }
-        )
-        async def refresh_server_info_panel(context) -> None:
-            await context.send('Refreshing server info panel...', delete_after=5.0)
-            await self.info_panel.refresh(context=context)
+            await self.info_panel.delete_embed(context=context)
 
         @self.command.slash(
             name='start_server_info_panel',

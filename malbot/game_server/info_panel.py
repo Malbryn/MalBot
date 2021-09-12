@@ -7,13 +7,17 @@ import time
 
 from datetime import datetime
 
+from discord import Client
+from discord.ext.commands import Context
+
 from malbot.database.database import Database
 from malbot.game_server.rcon import RCON
 
 
 class InfoPanel:
-    def __init__(self):
-        self.rcon_client = None
+    def __init__(self, database: Database, rcon_client: RCON):
+        self.database = database
+        self.rcon_client = rcon_client
 
         self.name = '<unknown>'
         self.address = '<unknown>'
@@ -35,15 +39,13 @@ class InfoPanel:
 
         self.refresh_rate = 120  # Seconds
 
-    async def fetch_data(self, db: Database, rcon_client: RCON) -> None:
+    async def fetch_data(self) -> None:
         print('Fetching data from database...')
 
         try:
-            db.connect()
+            await self.database.connect()
 
-            data = db.query('SELECT * FROM game_server WHERE id=1')
-
-            self.rcon_client = rcon_client
+            data = await self.database.query('SELECT * FROM game_server WHERE id=1')
 
             self.guild_id = int(data[1])
             self.channel_id = int(data[2])
@@ -58,33 +60,41 @@ class InfoPanel:
         except Exception as e:
             print('Unable to fetch data from database: ', e)
         finally:
-            db.disconnect()
+            await self.database.disconnect()
 
-    # TODO: update ID's to database
-    async def create_embed(self, rcon_client, context, address, password, modset) -> None:
+    async def create_embed(self, context: Context, address: str, password: str, modset: str) -> None:
         if self.message_id:
             await context.channel.send('Info panel already exist, '
                                        'please delete the old one first using `/delete_server_info_panel` command',
                                        delete_after=5.0)
             return None
 
-        self.rcon_client = rcon_client
-
         self.address = address
         self.password = password
         self.modset = modset
 
-        await self.__build_embed(context=context)
-
         try:
+            await self.__build_embed(context=context)
+
             message = await context.channel.send(embed=self.embed)
+
             self.message_id = message.id
+            self.guild_id = context.guild.id
+            self.channel_id = context.channel.id
+
+            await self.database.connect()
+            await self.database.query(
+                """
+                INSERT INTO game_server
+                (guild_id, channel_id, message_id, address, password, modset)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (self.guild_id, self.channel_id, self.message_id, address, password, modset))
         except Exception as e:
             print('Creating server info embed failed: ', e)
             await context.channel.send(f'Creating server info embed failed: {e}', delete_after=5.0)
 
-    # TODO: remove ID's from database?
-    async def delete(self, context) -> None:
+    async def delete_embed(self, context: Context) -> None:
         if not self.message_id:
             print('Info panel does not exist')
             await context.channel.send('Info panel does not exist', delete_after=5.0)
@@ -93,12 +103,13 @@ class InfoPanel:
         try:
             message = await context.channel.fetch_message(self.message_id)
             await message.delete()
+
+            await self.database.connect()
+            await self.database.query('DELETE FROM game_server WHERE message_id={}'.format(self.message_id))
         except Exception as e:
             print('Deleting info panel failed: ', e)
             await context.channel.send(f'Deleting info panel failed: {e}', delete_after=5.0)
             return None
-
-        await self.stop_monitoring()
 
         self.embed = discord.Embed(
             title='Server Info',
@@ -110,33 +121,7 @@ class InfoPanel:
 
         await context.channel.send('Deleted info panel', delete_after=5.0)
 
-    async def refresh(self, client) -> None:
-        print('Refreshing server info panel...')
-
-        if not self.message_id:
-            print('Info panel does not exist')
-            # await context.channel.send('Info panel does not exist', delete_after=5.0)
-            return None
-
-        await self.__build_embed(self)
-
-        try:
-            channel = client.get_channel(self.channel_id)
-
-            if not channel:
-                raise Exception('Channel is not found')
-
-            message = channel.fetch_message(self.message_id)
-
-            if not message:
-                raise Exception('Message is not found')
-
-            await message.edit(embed=self.embed)
-        except Exception as e:
-            print('Failed to fetch channel/message: ', e)
-            return None
-
-    async def start_monitoring(self, client) -> None:
+    async def start_monitoring(self, client: Client) -> None:
         print('Starting game server monitoring...')
 
         await client.wait_until_ready()
@@ -144,9 +129,45 @@ class InfoPanel:
             await self.refresh(client=client)
             await asyncio.sleep(self.refresh_rate)
 
+    # TODO: implement this
     async def stop_monitoring(self) -> None:
         print('Stopping game server monitoring...')
 
+    async def refresh(self, **kwargs) -> None:
+        context = kwargs.get('context', None)
+        client = kwargs.get('client', None)
+
+        if context:
+            print('Refreshing server info panel...')
+
+        if not self.message_id:
+            print('Info panel does not exist')
+
+            if context:
+                await context.channel.send('Info panel does not exist', delete_after=5.0)
+
+            return None
+
+        await self.__build_embed(self)
+
+        try:
+            channel = context.channel if context else client.get_channel(self.channel_id)
+
+            if not channel:
+                raise Exception('Channel is not found')
+
+            message = await channel.fetch_message(self.message_id)
+
+            if not message:
+                raise Exception('Message is not found')
+
+            await message.edit(embed=self.embed)
+        except Exception as e:
+            print('Failed to fetch channel/message: ', e)
+
+            return None
+
+    # TODO: is this still needed?
     async def __reattach(self) -> None:
         print('Attempting to reattach to server info panel...')
 
@@ -154,7 +175,7 @@ class InfoPanel:
             print('Cannot reattach to server info panel with the following ID\'s:')
             print('GUILD_ID = {}, CHANNEL_ID = {}, MESSAGE_ID = {}'
                   .format(self.guild_id, self.channel_id, self.message_id))
-            return
+            return None
 
         await self.__build_embed(self)
 
