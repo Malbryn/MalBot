@@ -207,10 +207,10 @@ class InfoPanel:
         print('Finished building embed')
 
     async def __init_details(self, context: Context) -> None:
-        with valve.source.a2s.ServerQuerier((os.environ['RCON_IP'], int(os.environ['QUERY_PORT']))) as server:
-            self.name = server.info().values['server_name']
-
         try:
+            with valve.source.a2s.ServerQuerier((os.environ['RCON_IP'], int(os.environ['QUERY_PORT']))) as server:
+                self.name = server.info().values['server_name']
+
             self.embed.add_field(
                 name='Details',
                 value='```\nServer name: {}\nAddress: {}\nPassword: {}```'.format(
