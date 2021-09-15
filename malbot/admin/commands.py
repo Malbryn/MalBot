@@ -25,7 +25,7 @@ class AdminCommands(Commands):
             guild_ids=[GUILD_ID],
             permissions={
                 GUILD_ID: [
-                    create_permission(ROLE_ID_EVERYONE, SlashCommandPermissionType.ROLE, True),
+                    create_permission(ROLE_ID_EVERYONE, SlashCommandPermissionType.ROLE, False),
                     create_permission(ROLE_ID_ADMIN, SlashCommandPermissionType.ROLE, True)
                 ]
             },
@@ -49,7 +49,7 @@ class AdminCommands(Commands):
             guild_ids=[GUILD_ID],
             permissions={
                 GUILD_ID: [
-                    create_permission(ROLE_ID_EVERYONE, SlashCommandPermissionType.ROLE, True),
+                    create_permission(ROLE_ID_EVERYONE, SlashCommandPermissionType.ROLE, False),
                     create_permission(ROLE_ID_ADMIN, SlashCommandPermissionType.ROLE, True)
                 ]
             },
