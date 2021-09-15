@@ -41,6 +41,7 @@ class AdminCommands(Commands):
         async def bar(context, user: Member) -> None:
             await context.send(f'{user.display_name} has been barred')
             await user.add_roles(context.guild.get_role(ROLE_ID_BARRED))
+            await user.edit(mute=True)
 
         @self.command.slash(
             name='unbar',
@@ -64,3 +65,4 @@ class AdminCommands(Commands):
         async def unbar(context, user: Member) -> None:
             await context.send(f'{user.display_name} has been unbarred')
             await user.remove_roles(context.guild.get_role(ROLE_ID_BARRED))
+            await user.edit(mute=False)
