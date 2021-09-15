@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands as discord_commands
 from discord_slash import SlashCommand
 
+from malbot.admin.commands import AdminCommands
 from malbot.common.commands import CommonCommands
 from malbot.database.database import Database
 from malbot.game_server.commands import GameServerCommands
@@ -54,6 +55,10 @@ class App(discord.Client):
     def init_commands(self):
         print('Initialising user commands...')
 
+        AdminCommands(
+            client=self,
+            command=self.command
+        ).init()
         CommonCommands(
             client=self,
             command=self.command
