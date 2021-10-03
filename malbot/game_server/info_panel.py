@@ -19,6 +19,7 @@ class InfoPanel:
         self.database = database
         self.rcon_client = rcon_client
 
+        self.game = '<unknown>'
         self.name = '<unknown>'
         self.address = '<unknown>'
         self.password = '<unknown>'
@@ -58,6 +59,7 @@ class InfoPanel:
             self.address = data[4]
             self.password = data[5]
             self.modset = data[6]
+            self.game = data[7]
 
             print('Server info panel reattached using ID of {}'.format(self.message_id))
 
@@ -67,13 +69,14 @@ class InfoPanel:
         finally:
             await self.database.disconnect()
 
-    async def create_embed(self, context: Context, address: str, password: str, modset: str) -> None:
+    async def create_embed(self, context: Context, game: str, address: str, password: str, modset: str) -> None:
         if self.message_id:
             await context.channel.send('Info panel already exist, '
                                        'please delete the old one first using `/delete_server_info_panel` command',
                                        delete_after=5.0)
             return None
 
+        self.game = game
         self.address = address
         self.password = password
         self.modset = modset
@@ -91,10 +94,10 @@ class InfoPanel:
             await self.database.query(
                 """
                 INSERT INTO game_server
-                (guild_id, channel_id, message_id, address, password, modset)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                (guild_id, channel_id, message_id, address, password, modset, game)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """,
-                (self.guild_id, self.channel_id, self.message_id, address, password, modset)
+                (self.guild_id, self.channel_id, self.message_id, address, password, modset, game)
             )
 
             print('Info panel created')
@@ -213,8 +216,8 @@ class InfoPanel:
 
             self.embed.add_field(
                 name='Details',
-                value='```\nServer name: {}\nAddress: {}\nPassword: {}```'.format(
-                    self.name, self.address, self.password
+                value='```\nGame: {}\n\nServer name: {}\nAddress: {}\nPassword: {}```'.format(
+                    self.game, self.name, self.address, self.password
                 ),
                 inline=False
             )

@@ -71,6 +71,12 @@ class GameServerCommands(Commands):
             },
             options=[
                 create_option(
+                    name='game',
+                    description='Name of the game',
+                    option_type=3,
+                    required=True
+                ),
+                create_option(
                     name='address',
                     description='IP and port of the server',
                     option_type=3,
@@ -90,10 +96,10 @@ class GameServerCommands(Commands):
                 )
             ]
         )
-        async def create_server_info_panel(context, address: str, password: str, modset: str) -> None:
+        async def create_server_info_panel(context, game: str, address: str, password: str, modset: str) -> None:
             await context.send('Creating server info panel...', delete_after=5.0)
             await self.info_panel.create_embed(
-                context=context, address=address, password=password, modset=modset
+                context=context, game=game, address=address, password=password, modset=modset
             )
 
         @self.command.slash(
