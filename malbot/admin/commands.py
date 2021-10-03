@@ -29,7 +29,7 @@ class AdminCommands(Commands):
                     create_permission(ROLE_ID_ADMIN, SlashCommandPermissionType.ROLE, True)
                 ]
             },
-            options = [
+            options=[
                 create_option(
                     name='user',
                     description='Tag a user to bar',

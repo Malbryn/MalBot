@@ -6,3 +6,4 @@ python-valve~=0.2.1
 requests~=2.26.0
 steam~=1.2.0
 psycopg2~=2.9.1
+youtube_dl

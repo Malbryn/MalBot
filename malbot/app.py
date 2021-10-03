@@ -10,6 +10,8 @@ from malbot.database.database import Database
 from malbot.game_server.commands import GameServerCommands
 from malbot.game_server.info_panel import InfoPanel
 from malbot.game_server.rcon import RCON
+from malbot.music.commands import MusicCommands
+from malbot.music.music import Music
 
 
 class App(discord.Client):
@@ -28,6 +30,9 @@ class App(discord.Client):
         # Set up game server tools
         self.rcon_client = RCON(api=os.environ['API_ENDPOINT'])
         self.info_panel = InfoPanel(database=self.database, rcon_client=self.rcon_client)
+
+        # Init music
+        self.music = Music(client=self.client)
 
         # Init slash commands
         self.command = SlashCommand(client=self, sync_commands=True)
@@ -68,4 +73,9 @@ class App(discord.Client):
             command=self.command,
             rcon_client=self.rcon_client,
             info_panel=self.info_panel
+        ).init()
+        MusicCommands(
+            client=self,
+            command=self.command,
+            music=self.music
         ).init()
