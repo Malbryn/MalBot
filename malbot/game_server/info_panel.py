@@ -226,7 +226,9 @@ class InfoPanel:
 
             self.embed.add_field(
                 name='Details',
-                value='```\nOFFLINE```',
+                value='```\nGame: {}\n\nSERVER OFFLINE```'.format(
+                    self.game
+                ),
                 inline=False
             )
 
