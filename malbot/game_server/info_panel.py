@@ -224,6 +224,12 @@ class InfoPanel:
         except Exception as e:
             print('Creating Details field failed: ', e)
 
+            self.embed.add_field(
+                name='Details',
+                value='```\nOFFLINE```',
+                inline=False
+            )
+
             if context:
                 await context.channel.send('Creating Details field failed: ', e)
 
