@@ -11,6 +11,7 @@ from discord import Client
 from discord.ext.commands import Context
 
 from malbot.database.database import Database
+from malbot.game_server.player import Player
 from malbot.game_server.rcon import RCON
 
 
@@ -269,10 +270,22 @@ class InfoPanel:
         try:
             self.player_list = ''
 
-            players = await self.rcon_client.get_players()
-
             with valve.source.a2s.ServerQuerier((os.environ['RCON_IP'], int(os.environ['QUERY_PORT']))) as server:
                 all_players = server.players().values['players']
+
+                if os.environ['PARSE_PLAYERLIST'] == "1":
+                    players = await self.rcon_client.get_players()
+                else:
+                    players = []
+
+                    for index, current_player in enumerate(all_players):
+                        current_player = Player(
+                            rcon_id=current_player.values.get('index'),
+                            name=current_player.values.get('name'),
+                            ping=current_player.values.get('ping')
+                        )
+
+                        players.append(current_player)
 
             for i in range(len(players), 0, -1):
                 players[i-1].duration = \
