@@ -282,7 +282,7 @@ class InfoPanel:
                         current_player = Player(
                             rcon_id=current_player.values.get('index'),
                             name=current_player.values.get('name'),
-                            ping=current_player.values.get('ping')
+                            ping=current_player.values.get('ping') or 0
                         )
 
                         players.append(current_player)
