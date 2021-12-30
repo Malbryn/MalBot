@@ -291,15 +291,15 @@ class InfoPanel:
                 players[i-1].duration = \
                     time.strftime('%H:%M:%S', time.gmtime(all_players[len(players) - i].values['duration']))
 
-                info = '{:>2} | {:>16} | {:>3} ms | {:>8}\n'.format(
+                info = '{:>2} | {:>20} | {:>3} ms | {:>8}\n'.format(
                     players[i-1].rcon_id, players[i-1].name, players[i-1].ping, players[i-1].duration
                 )
                 self.player_list += info
 
             self.embed.add_field(
                 name='Player list',
-                value='```\nID |             Name |   Ping | Duration'
-                      '\n-----------------------------------------\n{}```'.format(self.player_list),
+                value='```\nID |                 Name |   Ping | Duration'
+                      '\n---------------------------------------------\n{}```'.format(self.player_list),
                 inline=False
             )
         except Exception as e:
