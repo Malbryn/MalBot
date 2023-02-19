@@ -15,7 +15,7 @@ export const Ping: Command = {
         interaction: ChatInputCommandInteraction
     ) {
         const reply: Message<boolean> = await interaction.reply({
-            content: 'Pong [Latency: ms]',
+            content: 'Pong [Latency: :hourglass:]',
             fetchReply: true,
         });
         const latency: number =
