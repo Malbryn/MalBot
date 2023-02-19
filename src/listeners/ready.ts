@@ -1,5 +1,8 @@
 import { Client } from 'discord.js';
 import { commands } from '../commands';
+import { Logger } from 'tslog';
+
+const logger = new Logger();
 
 export default (client: Client): void => {
     client.on('ready', async () => {
@@ -9,6 +12,6 @@ export default (client: Client): void => {
 
         await client.application.commands.set(commands);
 
-        console.log(`${client.user.username} is online`);
+        logger.info(`${client.user.username} is online`);
     });
 };

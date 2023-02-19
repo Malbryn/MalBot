@@ -18,7 +18,8 @@
         ],
         "sourceMap": false,
         "baseUrl": "./",
-        "lib": ["es6"]
+        "lib": ["es6"],
+        "inlineSourceMap": true
     },
     "files": [
         "src/bot.ts"
