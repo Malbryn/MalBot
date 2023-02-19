@@ -1,13 +1,13 @@
 export {};
 
-import * as config from '../config.json';
 import { Client } from 'discord.js';
 import { exit } from 'process';
-import ready from './listeners/ready';
-import interactionCreate from './listeners/interactionCreate';
 import { Logger } from 'tslog';
+import * as config from '../config.json';
+import interactionCreate from './listeners/interactionCreate';
+import ready from './listeners/ready';
 
-const logger = new Logger();
+const logger = new Logger(config.loggerConfig);
 
 const DISCORD_TOKEN: string | undefined = config.discordToken;
 
