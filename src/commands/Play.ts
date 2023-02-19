@@ -3,7 +3,14 @@ import {
     SlashCommandStringOption,
     SlashCommandSubcommandBuilder,
 } from '@discordjs/builders';
-import { PlayerSearchResult, QueryType, Queue, Track } from 'discord-player';
+import {
+    Player,
+    PlayerSearchResult,
+    Playlist,
+    QueryType,
+    Queue,
+    Track,
+} from 'discord-player';
 import {
     ChatInputCommandInteraction,
     Guild,
@@ -150,22 +157,37 @@ async function handleSubcommand(
     subcommand: string,
     embedBuilder: EmbedBuilder
 ): Promise<void> {
+    const url: string | null = interaction.options.getString('url');
+    const player: Player | undefined = client.player;
+
+    if (!url) throw new Error('URL is missing!');
+    if (!player) throw new Error('Player is not initialised!');
+
     switch (subcommand) {
         case SUBCOMMANDS.SONG: {
-            await handleSongRequest(client, interaction, queue, embedBuilder);
-
+            await handleSongRequest(
+                interaction,
+                player,
+                url,
+                queue,
+                embedBuilder
+            );
             break;
         }
 
         case SUBCOMMANDS.SEARCH: {
-            await handleSearchRequest();
-
+            await handleSearchRequest(interaction, player, queue, embedBuilder);
             break;
         }
 
         case SUBCOMMANDS.PLAYLIST: {
-            await handlePlaylistRequest();
-
+            await handlePlaylistRequest(
+                interaction,
+                player,
+                url,
+                queue,
+                embedBuilder
+            );
             break;
         }
 
@@ -175,25 +197,97 @@ async function handleSubcommand(
 }
 
 async function handleSongRequest(
-    client: ExtendedClient,
     interaction: ChatInputCommandInteraction,
+    player: Player,
+    url: string,
     queue: Queue,
     embedBuilder: EmbedBuilder
 ): Promise<void> {
-    const url: string | null = interaction.options.getString('url');
-
-    if (!url) throw new Error('URL is missing!');
-    if (!client.player) throw new Error('Client player is not initialised!');
-
     logger.debug(`Song requested [URL: ${url}]`);
 
-    const result: PlayerSearchResult = await client.player.search(url, {
+    const result: PlayerSearchResult = await player.search(url, {
         requestedBy: interaction.user,
         searchEngine: QueryType.YOUTUBE_VIDEO,
     });
 
     if (result.tracks.length === 0) throw new Error('No results found!');
 
+    const song: Track = await addSongToQueue(result, queue);
+
+    embedBuilder
+        .setDescription(`Added **[${song.title}](${song.url})** to the queue`)
+        .setThumbnail(song.thumbnail)
+        .setFooter({ text: `Duration: ${song.duration}` });
+}
+
+async function handleSearchRequest(
+    interaction: ChatInputCommandInteraction,
+    player: Player,
+    queue: Queue,
+    embedBuilder: EmbedBuilder
+) {
+    const searchTerm: string | null =
+        interaction.options.getString('searchTerms');
+
+    if (!searchTerm) throw new Error('Search term is missing!');
+
+    logger.debug(`Searching for song [Prompt: ${searchTerm}]`);
+
+    const result: PlayerSearchResult = await player.search(searchTerm, {
+        requestedBy: interaction.user,
+        searchEngine: QueryType.YOUTUBE_SEARCH,
+    });
+
+    if (result.tracks.length === 0) throw new Error('No results found!');
+
+    const song: Track = await addSongToQueue(result, queue);
+
+    embedBuilder
+        .setDescription(
+            `**[${song.title}](${song.url})** has been added to the Queue`
+        )
+        .setThumbnail(song.thumbnail)
+        .setFooter({ text: `Duration: ${song.duration}` });
+}
+
+async function handlePlaylistRequest(
+    interaction: ChatInputCommandInteraction,
+    player: Player,
+    url: string,
+    queue: Queue,
+    embedBuilder: EmbedBuilder
+) {
+    logger.debug(`Playlist requested [URL: ${url}]`);
+
+    const result: PlayerSearchResult = await player.search(url, {
+        requestedBy: interaction.user,
+        searchEngine: QueryType.YOUTUBE_PLAYLIST,
+    });
+    const tracks: Track[] = result.tracks;
+
+    if (tracks.length === 0) throw new Error('No playlist found!');
+
+    const playlist: Playlist | null = result.playlist;
+
+    if (playlist) {
+        queue.addTracks(tracks);
+
+        logger.debug(`Playlist added to queue [Title: ${playlist.title}]`);
+
+        if (!queue.playing) await queue.play();
+
+        embedBuilder
+            .setDescription(
+                `**${tracks.length} songs from [${playlist.title}](${playlist.url})** have been added to the Queue`
+            )
+            .setThumbnail(playlist.thumbnail);
+    }
+}
+
+async function addSongToQueue(
+    result: PlayerSearchResult,
+    queue: Queue
+): Promise<Track> {
     const song: Track = result?.tracks[0];
     queue.addTrack(song);
 
@@ -203,16 +297,5 @@ async function handleSongRequest(
 
     if (!queue.playing) await queue.play();
 
-    embedBuilder
-        .setDescription(`Added **[${song.title}](${song.url})** to the queue`)
-        .setThumbnail(song.thumbnail)
-        .setFooter({ text: `Duration: ${song.duration}` });
-}
-
-async function handleSearchRequest() {
-    throw new Error('Not yet implemented!');
-}
-
-async function handlePlaylistRequest() {
-    throw new Error('Not yet implemented!');
+    return song;
 }
