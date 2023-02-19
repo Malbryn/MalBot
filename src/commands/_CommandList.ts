@@ -1,4 +1,8 @@
 import { Command } from '../interfaces/Command';
-import { ping } from './ping';
+import { Ping } from './Ping';
+import { Play } from './Play';
 
-export const commandList: Command[] = [ping];
+export const commandMap: Map<string, Command> = new Map<string, Command>();
+
+commandMap.set(Ping.data.name, Ping);
+commandMap.set(Play.data.name, Play);

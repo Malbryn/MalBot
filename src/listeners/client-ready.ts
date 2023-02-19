@@ -1,6 +1,6 @@
 import { Client, Events, REST, Routes } from 'discord.js';
 import { Logger } from 'tslog';
-import { commandList } from '../commands/_CommandList';
+import { commandMap } from '../commands/_CommandList';
 import { config } from '../config/config';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
@@ -14,10 +14,11 @@ export default (client: Client): void => {
         logger.info('Registering commands...');
 
         const rest = new REST({ version: '10' }).setToken(config.DISCORD_TOKEN);
-        const commandData = commandList.map((command) => command.data.toJSON());
+        const commands = Array.from(commandMap.values());
+        const commandData = commands.map((element) => element.data.toJSON());
 
         await rest.put(
-            Routes.applicationGuildCommands(client.user.id, config.GUILD_ID),
+            Routes.applicationGuildCommands(config.CLIENT_ID, config.GUILD_ID),
             { body: commandData }
         );
 
