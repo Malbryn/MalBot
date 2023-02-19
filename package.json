@@ -4,7 +4,7 @@
     "description": "A basic Discord bot written in TypeScript",
     "main": "index.js",
     "scripts": {
-        "start": "ts-node src/bot.ts"
+        "start": "ts-node src/main.ts"
     },
     "repository": {
         "type": "git",

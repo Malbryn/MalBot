@@ -22,7 +22,7 @@
         "inlineSourceMap": true
     },
     "files": [
-        "src/bot.ts"
+        "src/main.ts"
     ],
     "include": [
         "./src/**/*.ts"
