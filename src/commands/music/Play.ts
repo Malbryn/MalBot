@@ -67,6 +67,7 @@ export const Play: Command = {
         embedBuilder.setColor(embedColours.INFO).setAuthor({
             name: '🔎 Searching...',
         } as EmbedAuthorOptions);
+
         await interaction.reply({
             embeds: [embedBuilder],
             fetchReply: true,
@@ -115,9 +116,13 @@ export const Play: Command = {
                 }
             }
         } else {
-            await interaction.reply(
-                'You must be in a voice channel to use this command.'
-            );
+            embedBuilder.setColor(embedColours.INFO).setAuthor({
+                name: '❌ You must be in a voice channel to use this command!',
+            } as EmbedAuthorOptions);
+
+            await interaction.editReply({
+                embeds: [embedBuilder],
+            });
         }
     },
 };
