@@ -9,6 +9,9 @@
     },
     "music": {
         "quality": "highestaudio",
-        "filter": "audioonly"
+        "filter": "audioonly",
+        "liveBuffer": 20000,
+        "highWaterMark": 33554432,
+        "dlChunkSize": 10485760
     }
 }
