@@ -19,9 +19,9 @@ import {
     VoiceBasedChannel,
 } from 'discord.js';
 import { Logger } from 'tslog';
-import { config } from '../config/config';
-import { Command } from '../interfaces/Command';
-import { ExtendedClient } from '../models/ExtendedClient';
+import { config } from '../../config/config';
+import { Command } from '../../interfaces/Command';
+import { ExtendedClient } from '../../models/ExtendedClient';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
@@ -294,7 +294,6 @@ async function addSongToQueue(
     );
 
     // TODO: 'queue.playing' is currently broken on 5.4.0
-    // if (!queue.playing) await queue.play();
     if (!queue.playing) await queue.play();
 
     return song;

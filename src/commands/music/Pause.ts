@@ -1,16 +1,16 @@
 import { Queue } from 'discord-player';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { Command } from 'src/interfaces/Command';
-import { ExtendedClient } from 'src/models/ExtendedClient';
 import { Logger } from 'tslog';
-import { config } from '../config/config';
+import { config } from '../../config/config';
+import { Command } from '../../interfaces/Command';
+import { ExtendedClient } from '../../models/ExtendedClient';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-export const Resume: Command = {
+export const Pause: Command = {
     data: new SlashCommandBuilder()
-        .setName('resume')
-        .setDescription('Resumes the current song.'),
+        .setName('pause')
+        .setDescription('Pauses the current song.'),
     async run(
         client: ExtendedClient,
         interaction: ChatInputCommandInteraction
@@ -21,10 +21,10 @@ export const Resume: Command = {
             const queue: Queue | undefined = client.player?.getQueue(guildId);
 
             if (queue) {
-                logger.debug('Resuming player');
+                logger.debug('Pausing player');
 
-                queue.setPaused(false);
-                await interaction.reply('Player has been resumed');
+                queue.setPaused(true);
+                await interaction.reply('Player has been paused');
             } else {
                 await interaction.reply('There are no songs in the queue');
             }

@@ -1,5 +1,6 @@
 import { Command } from '../interfaces/Command';
-import { Play, Pause, Resume, Ping, Queue, Skip, Stop } from './';
+import { Ping } from './misc';
+import { Pause, Play, Queue, Resume, Skip, Stop } from './music';
 
 export const commandMap: Map<string, Command> = new Map<string, Command>();
 

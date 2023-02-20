@@ -1,14 +1,13 @@
-import { Track } from 'discord-player';
-import { Queue as PlayerQueue } from 'discord-player';
+import { Queue as PlayerQueue, Track } from 'discord-player';
 import {
     ChatInputCommandInteraction,
     EmbedBuilder,
     SlashCommandBuilder,
 } from 'discord.js';
-import { Command } from 'src/interfaces/Command';
-import { ExtendedClient } from 'src/models/ExtendedClient';
 import { Logger } from 'tslog';
-import { config } from '../config/config';
+import { config } from '../../config/config';
+import { Command } from '../../interfaces/Command';
+import { ExtendedClient } from '../../models/ExtendedClient';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 

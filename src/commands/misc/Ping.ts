@@ -3,8 +3,8 @@ import {
     Message,
     SlashCommandBuilder,
 } from 'discord.js';
-import { Command } from 'src/interfaces/Command';
-import { ExtendedClient } from 'src/models/ExtendedClient';
+import { Command } from '../../interfaces/Command';
+import { ExtendedClient } from '../../models/ExtendedClient';
 
 export const Ping: Command = {
     data: new SlashCommandBuilder()

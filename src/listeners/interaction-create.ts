@@ -4,8 +4,8 @@ import {
     Events,
     Interaction,
 } from 'discord.js';
-import { ExtendedClient } from 'src/models/ExtendedClient';
 import { Logger } from 'tslog';
+import { ExtendedClient } from '../models/ExtendedClient';
 import { commandMap } from '../commands/_CommandList';
 import { config } from '../config/config';
 
