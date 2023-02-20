@@ -84,7 +84,7 @@ export const Play: Command = {
                 await connectToVoiceChannel(queue, voiceChannel);
 
                 const subcommand: string = interaction.options.getSubcommand();
-                const embedBuilder = new EmbedBuilder();
+                const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
                 try {
                     await handleSubcommand(
@@ -157,21 +157,13 @@ async function handleSubcommand(
     subcommand: string,
     embedBuilder: EmbedBuilder
 ): Promise<void> {
-    const url: string | null = interaction.options.getString('url');
     const player: Player | undefined = client.player;
 
-    if (!url) throw new Error('URL is missing!');
     if (!player) throw new Error('Player is not initialised!');
 
     switch (subcommand) {
         case SUBCOMMANDS.SONG: {
-            await handleSongRequest(
-                interaction,
-                player,
-                url,
-                queue,
-                embedBuilder
-            );
+            await handleSongRequest(interaction, player, queue, embedBuilder);
             break;
         }
 
@@ -184,7 +176,6 @@ async function handleSubcommand(
             await handlePlaylistRequest(
                 interaction,
                 player,
-                url,
                 queue,
                 embedBuilder
             );
@@ -199,10 +190,13 @@ async function handleSubcommand(
 async function handleSongRequest(
     interaction: ChatInputCommandInteraction,
     player: Player,
-    url: string,
     queue: Queue,
     embedBuilder: EmbedBuilder
 ): Promise<void> {
+    const url: string | null = interaction.options.getString('url');
+
+    if (!url) throw new Error('URL is missing!');
+
     logger.debug(`Song requested [URL: ${url}]`);
 
     const result: PlayerSearchResult = await player.search(url, {
@@ -227,7 +221,7 @@ async function handleSearchRequest(
     embedBuilder: EmbedBuilder
 ) {
     const searchTerm: string | null =
-        interaction.options.getString('searchTerms');
+        interaction.options.getString('searchterms');
 
     if (!searchTerm) throw new Error('Search term is missing!');
 
@@ -253,10 +247,13 @@ async function handleSearchRequest(
 async function handlePlaylistRequest(
     interaction: ChatInputCommandInteraction,
     player: Player,
-    url: string,
     queue: Queue,
     embedBuilder: EmbedBuilder
 ) {
+    const url: string | null = interaction.options.getString('url');
+
+    if (!url) throw new Error('URL is missing!');
+
     logger.debug(`Playlist requested [URL: ${url}]`);
 
     const result: PlayerSearchResult = await player.search(url, {
@@ -288,13 +285,16 @@ async function addSongToQueue(
     result: PlayerSearchResult,
     queue: Queue
 ): Promise<Track> {
-    const song: Track = result?.tracks[0];
+    const song: Track = result.tracks[0];
+
     queue.addTrack(song);
 
     logger.debug(
         `Track added to queue [Title: ${song.title}] [Duration: ${song.duration}]`
     );
 
+    // TODO: 'queue.playing' is currently broken on 5.4.0
+    // if (!queue.playing) await queue.play();
     if (!queue.playing) await queue.play();
 
     return song;
