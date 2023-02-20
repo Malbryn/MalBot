@@ -1,10 +1,16 @@
 import {
     ChatInputCommandInteraction,
+    EmbedAuthorOptions,
+    EmbedBuilder,
     Message,
     SlashCommandBuilder,
 } from 'discord.js';
+import { Logger } from 'tslog';
+import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
 import { ExtendedClient } from '../../models/ExtendedClient';
+
+const logger = new Logger(config.LOGGER_SETTINGS);
 
 export const Ping: Command = {
     data: new SlashCommandBuilder()
@@ -14,13 +20,23 @@ export const Ping: Command = {
         client: ExtendedClient,
         interaction: ChatInputCommandInteraction
     ) {
+        const embedBuilder: EmbedBuilder = new EmbedBuilder();
+        embedBuilder.setColor(embedColours.INFO).setAuthor({
+            name: '⏱ Measuring latency...',
+        } as EmbedAuthorOptions);
+
         const reply: Message<boolean> = await interaction.reply({
-            content: 'Pong [Latency: :hourglass:]',
+            embeds: [embedBuilder],
             fetchReply: true,
         });
         const latency: number =
             reply.createdTimestamp - interaction.createdTimestamp;
 
-        interaction.editReply(`Pong [Latency: ${latency}ms]`);
+        embedBuilder.setAuthor({
+            name: `⏱ Latency: ${latency}ms`,
+        } as EmbedAuthorOptions);
+        interaction.editReply({ embeds: [embedBuilder] });
+
+        logger.debug(`Latency: ${latency}ms`);
     },
 };

@@ -1,11 +1,12 @@
 import { Queue, Track } from 'discord-player';
 import {
     ChatInputCommandInteraction,
+    EmbedAuthorOptions,
     EmbedBuilder,
     SlashCommandBuilder,
 } from 'discord.js';
 import { Logger } from 'tslog';
-import { config } from '../../config/config';
+import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
 import { ExtendedClient } from '../../models/ExtendedClient';
 
@@ -23,25 +24,27 @@ export const Skip: Command = {
 
         if (guildId) {
             const queue: Queue | undefined = client.player?.getQueue(guildId);
+            const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
             if (queue) {
                 logger.debug('Skipping current song');
 
                 const currentSong: Track = queue.current;
-                queue.skip();
 
-                await interaction.reply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setDescription(
-                                `${currentSong.title} has been skipped`
-                            )
-                            .setThumbnail(currentSong.thumbnail),
-                    ],
-                });
+                queue.skip();
+                embedBuilder.setColor(embedColours.INFO).setAuthor({
+                    name: `⏩ Skipped ${currentSong.title}`,
+                } as EmbedAuthorOptions);
             } else {
-                await interaction.reply('There are no songs in the queue');
+                embedBuilder;
+                embedBuilder.setColor(embedColours.WARNING).setAuthor({
+                    name: '❌ There are no songs in the queue',
+                } as EmbedAuthorOptions);
             }
+
+            await interaction.reply({
+                embeds: [embedBuilder],
+            });
         }
     },
 };

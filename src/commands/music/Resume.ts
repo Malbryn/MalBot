@@ -1,7 +1,13 @@
 import { Queue } from 'discord-player';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    EmbedAuthorOptions,
+    EmbedBuilder,
+    RGBTuple,
+    SlashCommandBuilder,
+} from 'discord.js';
 import { Logger } from 'tslog';
-import { config } from '../../config/config';
+import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
 import { ExtendedClient } from '../../models/ExtendedClient';
 
@@ -19,15 +25,24 @@ export const Resume: Command = {
 
         if (guildId) {
             const queue: Queue | undefined = client.player?.getQueue(guildId);
+            const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
             if (queue) {
                 logger.debug('Resuming player');
 
                 queue.setPaused(false);
-                await interaction.reply('Player has been resumed');
+                embedBuilder.setColor(embedColours.INFO).setAuthor({
+                    name: '▶️ Player has been resumed',
+                } as EmbedAuthorOptions);
             } else {
-                await interaction.reply('There are no songs in the queue');
+                embedBuilder.setColor(embedColours.WARNING).setAuthor({
+                    name: '❌ There are no songs in the queue',
+                } as EmbedAuthorOptions);
             }
+
+            await interaction.reply({
+                embeds: [embedBuilder],
+            });
         }
     },
 };

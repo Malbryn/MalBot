@@ -1,10 +1,13 @@
 import {
+    EmbedAuthorOptions,
     EmbedBuilder,
+    RGBTuple,
     SlashCommandStringOption,
     SlashCommandSubcommandBuilder,
 } from '@discordjs/builders';
 import {
     Player,
+    PlayerOptions,
     PlayerSearchResult,
     Playlist,
     QueryType,
@@ -19,7 +22,7 @@ import {
     VoiceBasedChannel,
 } from 'discord.js';
 import { Logger } from 'tslog';
-import { config } from '../../config/config';
+import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
 import { ExtendedClient } from '../../models/ExtendedClient';
 
@@ -87,12 +90,18 @@ export const Play: Command = {
                         embeds: [embedBuilder],
                     });
                 } catch (error) {
-                    const message = (error as Error).message;
+                    const message: string = (error as Error)?.message ?? '';
 
                     logger.warn(
                         `Failed to play song or playlist [Reason: ${message}]`
                     );
-                    await interaction.reply(message);
+
+                    embedBuilder.setColor(embedColours.ERROR).setAuthor({
+                        name: `❌ ${message}`,
+                    } as EmbedAuthorOptions);
+                    await interaction.reply({
+                        embeds: [embedBuilder],
+                    });
                 }
             }
         } else {
@@ -132,8 +141,11 @@ function createQueue(
     interaction: ChatInputCommandInteraction
 ): Queue | undefined {
     const guild: Guild | undefined = getGuild(client, interaction);
+    const queueOptions: PlayerOptions = {
+        leaveOnEnd: false,
+    };
 
-    return guild ? client.player?.createQueue(guild) : undefined;
+    return guild ? client.player?.createQueue(guild, queueOptions) : undefined;
 }
 
 async function connectToVoiceChannel(
@@ -188,8 +200,13 @@ async function handleSongRequest(
     const song: Track = await addSongToQueue(result, queue);
 
     embedBuilder
-        .setDescription(`Added **[${song.title}](${song.url})** to the queue`)
+        .setTitle(`**${song.title}**`)
+        .setURL(song.url)
+        .setColor(embedColours.INFO)
         .setThumbnail(song.thumbnail)
+        .setAuthor({
+            name: '▶️ Added song to the queue',
+        } as EmbedAuthorOptions)
         .setFooter({ text: `Duration: ${song.duration}` });
 }
 
@@ -211,7 +228,7 @@ async function handlePlaylistRequest(
     });
     const tracks: Track[] = result.tracks;
 
-    if (tracks.length === 0) throw new Error('No playlist found!');
+    if (tracks.length === 0) throw new Error('Playlist is not found!');
 
     const playlist: Playlist | null = result.playlist;
 
@@ -223,10 +240,15 @@ async function handlePlaylistRequest(
         if (!queue.playing) await queue.play();
 
         embedBuilder
-            .setDescription(
-                `**${tracks.length} songs from [${playlist.title}](${playlist.url})** have been added to the Queue`
-            )
-            .setThumbnail(playlist.thumbnail);
+            .setTitle(`**${playlist.title}**`)
+            .setURL(playlist.url)
+            .setColor(embedColours.INFO)
+            // @ts-ignore
+            .setThumbnail(playlist.thumbnail.url)
+            .setAuthor({
+                name: '▶️ Added playlist to the queue',
+            } as EmbedAuthorOptions)
+            .setFooter({ text: `${tracks.length} items` });
     }
 }
 

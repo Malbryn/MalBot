@@ -1,7 +1,12 @@
 import { Queue } from 'discord-player';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    EmbedAuthorOptions,
+    EmbedBuilder,
+    SlashCommandBuilder,
+} from 'discord.js';
 import { Logger } from 'tslog';
-import { config } from '../../config/config';
+import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
 import { ExtendedClient } from '../../models/ExtendedClient';
 
@@ -18,6 +23,7 @@ export const Stop: Command = {
         interaction: ChatInputCommandInteraction
     ) {
         const guildId: string | null = interaction.guildId;
+        const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
         if (guildId) {
             const queue: Queue | undefined = client.player?.getQueue(guildId);
@@ -26,10 +32,18 @@ export const Stop: Command = {
                 logger.debug('Stopping player');
 
                 queue.destroy();
-                await interaction.reply('Player has been stopped');
+                embedBuilder.setColor(embedColours.INFO).setAuthor({
+                    name: '⏹ Player has been stopped',
+                } as EmbedAuthorOptions);
             } else {
-                await interaction.reply('There are no songs in the queue');
+                embedBuilder.setColor(embedColours.WARNING).setAuthor({
+                    name: '❌ There are no songs in the queue',
+                } as EmbedAuthorOptions);
             }
+
+            await interaction.reply({
+                embeds: [embedBuilder],
+            });
         }
     },
 };

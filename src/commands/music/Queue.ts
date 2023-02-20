@@ -1,11 +1,13 @@
 import { Queue as PlayerQueue, Track } from 'discord-player';
 import {
+    APIEmbedField,
     ChatInputCommandInteraction,
+    EmbedAuthorOptions,
     EmbedBuilder,
     SlashCommandBuilder,
 } from 'discord.js';
 import { Logger } from 'tslog';
-import { config } from '../../config/config';
+import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
 import { ExtendedClient } from '../../models/ExtendedClient';
 
@@ -14,7 +16,7 @@ const logger = new Logger(config.LOGGER_SETTINGS);
 export const Queue: Command = {
     data: new SlashCommandBuilder()
         .setName('queue')
-        .setDescription('Shows the first 10 songs in the queue.'),
+        .setDescription('Shows the first 5 songs in the queue.'),
     async run(
         client: ExtendedClient,
         interaction: ChatInputCommandInteraction
@@ -24,35 +26,48 @@ export const Queue: Command = {
         if (guildId) {
             const queue: PlayerQueue | undefined =
                 client.player?.getQueue(guildId);
+            const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
             if (queue) {
-                const queueString: string = queue.tracks
-                    .slice(0, 10)
-                    .map((song: Track, i: number) => {
-                        return `${i}) [${song.duration}]\` ${song.title} - <@${song.requestedBy.id}>`;
-                    })
-                    .join('\n');
+                const tracks = queue.tracks;
 
-                logger.debug('Current queue: ', queue.tracks);
+                logger.debug('Current queue: ', tracks);
 
+                const queueString: string =
+                    tracks.length === 0
+                        ? '*empty*'
+                        : tracks
+                              .slice(0, 5)
+                              .map((song: Track, i: number) => {
+                                  return `${i} - [${song.duration}]\` ${song.title} - ${song.requestedBy.username}`;
+                              })
+                              .join('\n');
                 const currentSong: Track = queue.current;
+                const currentSongTitle: string = currentSong
+                    ? `\`[${currentSong.duration}]\` ${currentSong.title}`
+                    : 'None';
+                const fields: APIEmbedField[] = [
+                    { name: 'Queue', value: queueString },
+                ];
 
-                await interaction.reply({
-                    embeds: [
-                        new EmbedBuilder()
-                            .setDescription(
-                                `**Currently Playing**\n` +
-                                    (currentSong
-                                        ? `\`[${currentSong.duration}]\` ${currentSong.title} - <@${currentSong.requestedBy.id}>`
-                                        : 'None') +
-                                    `\n\n**Queue**\n${queueString}`
-                            )
-                            .setThumbnail(currentSong.thumbnail),
-                    ],
-                });
+                embedBuilder
+                    .setTitle(`**${currentSongTitle}**`)
+                    .setURL(currentSong.url)
+                    .setColor(embedColours.INFO)
+                    .setThumbnail(currentSong.thumbnail)
+                    .setAuthor({
+                        name: `▶️ Currently playing`,
+                    } as EmbedAuthorOptions)
+                    .addFields(fields);
             } else {
-                await interaction.reply('There are no songs in the queue');
+                embedBuilder.setColor(embedColours.WARNING).setAuthor({
+                    name: '❌ There are no songs in the queue',
+                } as EmbedAuthorOptions);
             }
+
+            await interaction.reply({
+                embeds: [embedBuilder],
+            });
         }
     },
 };
