@@ -26,7 +26,6 @@ import { ExtendedClient } from '../../models/ExtendedClient';
 const logger = new Logger(config.LOGGER_SETTINGS);
 
 enum SUBCOMMANDS {
-    SEARCH = 'search',
     SONG = 'song',
     PLAYLIST = 'playlist',
 }
@@ -34,37 +33,26 @@ enum SUBCOMMANDS {
 export const Play: Command = {
     data: new SlashCommandBuilder()
         .setName('play')
-        .setDescription('Plays a song.')
+        .setDescription('Plays a song or playlist.')
         .addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
             subcommand
-                .setName(SUBCOMMANDS.SEARCH)
-                .setDescription('Searches for a song.')
+                .setName(SUBCOMMANDS.SONG)
+                .setDescription('Plays a song from YouTube.')
                 .addStringOption((option: SlashCommandStringOption) =>
                     option
-                        .setName('searchterms')
-                        .setDescription('keywords')
+                        .setName('query')
+                        .setDescription('Song URL or search keywords')
                         .setRequired(true)
                 )
         )
         .addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
             subcommand
                 .setName(SUBCOMMANDS.PLAYLIST)
-                .setDescription('Plays a playlist from YouTube')
+                .setDescription('Plays a playlist from YouTube.')
                 .addStringOption((option: SlashCommandStringOption) =>
                     option
                         .setName('url')
-                        .setDescription('playlist url')
-                        .setRequired(true)
-                )
-        )
-        .addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
-            subcommand
-                .setName(SUBCOMMANDS.SONG)
-                .setDescription('Plays a song from YouTube')
-                .addStringOption((option: SlashCommandStringOption) =>
-                    option
-                        .setName('url')
-                        .setDescription('song url')
+                        .setDescription('Playlist URL')
                         .setRequired(true)
                 )
         ),
@@ -99,7 +87,12 @@ export const Play: Command = {
                         embeds: [embedBuilder],
                     });
                 } catch (error) {
-                    await interaction.reply((error as Error).message);
+                    const message = (error as Error).message;
+
+                    logger.warn(
+                        `Failed to play song or playlist [Reason: ${message}]`
+                    );
+                    await interaction.reply(message);
                 }
             }
         } else {
@@ -147,7 +140,7 @@ async function connectToVoiceChannel(
     queue: Queue,
     voiceChannel: VoiceBasedChannel
 ): Promise<void> {
-    if (!queue.connection) await queue?.connect(voiceChannel);
+    if (!queue.connection) await queue.connect(voiceChannel);
 }
 
 async function handleSubcommand(
@@ -161,29 +154,10 @@ async function handleSubcommand(
 
     if (!player) throw new Error('Player is not initialised!');
 
-    switch (subcommand) {
-        case SUBCOMMANDS.SONG: {
-            await handleSongRequest(interaction, player, queue, embedBuilder);
-            break;
-        }
-
-        case SUBCOMMANDS.SEARCH: {
-            await handleSearchRequest(interaction, player, queue, embedBuilder);
-            break;
-        }
-
-        case SUBCOMMANDS.PLAYLIST: {
-            await handlePlaylistRequest(
-                interaction,
-                player,
-                queue,
-                embedBuilder
-            );
-            break;
-        }
-
-        default:
-            break;
+    if (subcommand === SUBCOMMANDS.SONG) {
+        await handleSongRequest(interaction, player, queue, embedBuilder);
+    } else {
+        await handlePlaylistRequest(interaction, player, queue, embedBuilder);
     }
 }
 
@@ -193,15 +167,20 @@ async function handleSongRequest(
     queue: Queue,
     embedBuilder: EmbedBuilder
 ): Promise<void> {
-    const url: string | null = interaction.options.getString('url');
+    const query: string | null = interaction.options.getString('query');
 
-    if (!url) throw new Error('URL is missing!');
+    if (!query) throw new Error('Query is missing!');
 
-    logger.debug(`Song requested [URL: ${url}]`);
+    const isUrl: boolean = isYoutubeUrl(query);
 
-    const result: PlayerSearchResult = await player.search(url, {
+    logger.debug(`Song requested [Query: ${query}] [URL: ${isUrl}]`);
+
+    const searchEngine: QueryType = isUrl
+        ? QueryType.YOUTUBE_VIDEO
+        : QueryType.YOUTUBE_SEARCH;
+    const result: PlayerSearchResult = await player.search(query, {
         requestedBy: interaction.user,
-        searchEngine: QueryType.YOUTUBE_VIDEO,
+        searchEngine,
     });
 
     if (result.tracks.length === 0) throw new Error('No results found!');
@@ -210,36 +189,6 @@ async function handleSongRequest(
 
     embedBuilder
         .setDescription(`Added **[${song.title}](${song.url})** to the queue`)
-        .setThumbnail(song.thumbnail)
-        .setFooter({ text: `Duration: ${song.duration}` });
-}
-
-async function handleSearchRequest(
-    interaction: ChatInputCommandInteraction,
-    player: Player,
-    queue: Queue,
-    embedBuilder: EmbedBuilder
-) {
-    const searchTerm: string | null =
-        interaction.options.getString('searchterms');
-
-    if (!searchTerm) throw new Error('Search term is missing!');
-
-    logger.debug(`Searching for song [Prompt: ${searchTerm}]`);
-
-    const result: PlayerSearchResult = await player.search(searchTerm, {
-        requestedBy: interaction.user,
-        searchEngine: QueryType.YOUTUBE_SEARCH,
-    });
-
-    if (result.tracks.length === 0) throw new Error('No results found!');
-
-    const song: Track = await addSongToQueue(result, queue);
-
-    embedBuilder
-        .setDescription(
-            `**[${song.title}](${song.url})** has been added to the Queue`
-        )
         .setThumbnail(song.thumbnail)
         .setFooter({ text: `Duration: ${song.duration}` });
 }
@@ -297,4 +246,11 @@ async function addSongToQueue(
     if (!queue.playing) await queue.play();
 
     return song;
+}
+
+function isYoutubeUrl(query: string): boolean {
+    const regExp: RegExp =
+        /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+
+    return query.match(regExp) !== null;
 }
