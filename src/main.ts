@@ -3,10 +3,11 @@ export {};
 import { Player } from 'discord-player';
 import { GatewayIntentBits } from 'discord.js';
 import { Logger } from 'tslog';
+import { Filter } from 'ytdl-core';
 import { config } from './config/config';
-import { ExtendedClient } from './models/ExtendedClient';
 import handleClientReady from './listeners/client-ready';
 import handleInteractionCreate from './listeners/interaction-create';
+import { ExtendedClient } from './models/ExtendedClient';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
@@ -23,7 +24,8 @@ handleInteractionCreate(client);
 // Initialise player
 client.player = new Player(client, {
     ytdlOptions: {
-        quality: 'highestaudio',
+        quality: config.MUSIC_QUALITY,
+        filter: config.MUSIC_FILTER as Filter,
         highWaterMark: 1 << 25,
     },
 });

@@ -1,0 +1,14 @@
+{
+    "client": {
+        "discordToken": "<DISCORD_TOKEN>",
+        "clientID": "<CLIENT_ID>",
+        "guildID": "<GUILD_ID>"
+    },
+    "loggerSettings": {
+        "prettyLogTemplate": "{{dateIsoStr}} {{logLevelName}}\t"
+    },
+    "music": {
+        "quality": "highestaudio",
+        "filter": "audioonly"
+    }
+}

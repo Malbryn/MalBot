@@ -6,6 +6,8 @@ export const config = {
     GUILD_ID: appConfig.client.guildID,
     CLIENT_ID: appConfig.client.clientID,
     LOGGER_SETTINGS: appConfig.loggerSettings,
+    MUSIC_QUALITY: appConfig.music.quality,
+    MUSIC_FILTER: appConfig.music.filter,
 };
 
 export interface ColourPalette {
