@@ -1,7 +1,6 @@
 import {
     EmbedAuthorOptions,
     EmbedBuilder,
-    RGBTuple,
     SlashCommandStringOption,
     SlashCommandSubcommandBuilder,
 } from '@discordjs/builders';
@@ -63,6 +62,16 @@ export const Play: Command = {
         client: ExtendedClient,
         interaction: ChatInputCommandInteraction
     ) {
+        const embedBuilder: EmbedBuilder = new EmbedBuilder();
+
+        embedBuilder.setColor(embedColours.INFO).setAuthor({
+            name: '🔎 Searching...',
+        } as EmbedAuthorOptions);
+        await interaction.reply({
+            embeds: [embedBuilder],
+            fetchReply: true,
+        });
+
         const voiceChannel: VoiceBasedChannel | undefined = getVoiceChannel(
             client,
             interaction
@@ -75,7 +84,6 @@ export const Play: Command = {
                 await connectToVoiceChannel(queue, voiceChannel);
 
                 const subcommand: string = interaction.options.getSubcommand();
-                const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
                 try {
                     await handleSubcommand(
@@ -86,21 +94,23 @@ export const Play: Command = {
                         embedBuilder
                     );
 
-                    await interaction.reply({
+                    await interaction.editReply({
                         embeds: [embedBuilder],
                     });
                 } catch (error) {
                     const message: string = (error as Error)?.message ?? '';
+                    const errorEmbedBuilder: EmbedBuilder = new EmbedBuilder();
 
                     logger.warn(
                         `Failed to play song or playlist [Reason: ${message}]`
                     );
 
-                    embedBuilder.setColor(embedColours.ERROR).setAuthor({
+                    errorEmbedBuilder.setColor(embedColours.ERROR).setAuthor({
                         name: `❌ ${message}`,
                     } as EmbedAuthorOptions);
-                    await interaction.reply({
-                        embeds: [embedBuilder],
+
+                    await interaction.editReply({
+                        embeds: [errorEmbedBuilder],
                     });
                 }
             }
@@ -172,7 +182,6 @@ async function handleSubcommand(
         await handlePlaylistRequest(interaction, player, queue, embedBuilder);
     }
 }
-
 async function handleSongRequest(
     interaction: ChatInputCommandInteraction,
     player: Player,
