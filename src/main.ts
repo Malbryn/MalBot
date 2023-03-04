@@ -1,7 +1,7 @@
 export {};
 
 import { Player } from 'discord-player';
-import { Client, GatewayIntentBits } from 'discord.js';
+import { ActivityType, Client, GatewayIntentBits } from 'discord.js';
 import { Logger } from 'tslog';
 import { Filter, downloadOptions } from 'ytdl-core';
 import { config } from './config/config';
@@ -15,6 +15,9 @@ logger.info('Starting bot...');
 // Initialise client
 const client: Client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+    presence: {
+        activities: [{ name: 'Bottom Gear', type: ActivityType.Watching }],
+    },
 });
 
 handleClientReady(client);
