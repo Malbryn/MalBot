@@ -1,20 +1,19 @@
 export {};
 
 import { Player } from 'discord-player';
-import { GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits } from 'discord.js';
 import { Logger } from 'tslog';
 import { Filter, downloadOptions } from 'ytdl-core';
 import { config } from './config/config';
 import handleClientReady from './listeners/client-ready';
 import handleInteractionCreate from './listeners/interaction-create';
-import { ExtendedClient } from './models/ExtendedClient';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
 logger.info('Starting bot...');
 
 // Initialise client
-const client: ExtendedClient = new ExtendedClient({
+const client: Client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
 });
 
@@ -30,11 +29,9 @@ const ytdlOptions: Partial<downloadOptions> = {
     dlChunkSize: config.MUSIC_DOWNLOAD_CHUNK_SIZE,
 };
 
-client.player = new Player(client, { ytdlOptions });
+export const player = Player.singleton(client, { ytdlOptions });
 
-const playerOptions: downloadOptions | undefined =
-    client.player.options.ytdlOptions;
-logger.debug('Initialised music player: ', playerOptions);
+logger.debug('Initialised music player: ', player.options.ytdlOptions);
 
 // Log in with token
 client.login(config.DISCORD_TOKEN);

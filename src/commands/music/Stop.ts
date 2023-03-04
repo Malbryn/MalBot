@@ -1,6 +1,7 @@
-import { Queue } from 'discord-player';
+import { GuildQueue } from 'discord-player';
 import {
     ChatInputCommandInteraction,
+    Client,
     EmbedAuthorOptions,
     EmbedBuilder,
     SlashCommandBuilder,
@@ -8,7 +9,7 @@ import {
 import { Logger } from 'tslog';
 import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
-import { ExtendedClient } from '../../models/ExtendedClient';
+import { player } from '../../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
@@ -18,32 +19,25 @@ export const Stop: Command = {
         .setDescription(
             'Stops the player and kicks the bot from the voice channel.'
         ),
-    async run(
-        client: ExtendedClient,
-        interaction: ChatInputCommandInteraction
-    ) {
-        const guildId: string | null = interaction.guildId;
+    async run(client: Client, interaction: ChatInputCommandInteraction) {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
+        const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
 
-        if (guildId) {
-            const queue: Queue | undefined = client.player?.getQueue(guildId);
+        if (queue) {
+            logger.debug('Stopping player');
 
-            if (queue) {
-                logger.debug('Stopping player');
-
-                queue.destroy();
-                embedBuilder.setColor(embedColours.INFO).setAuthor({
-                    name: '⏹ Player has been stopped',
-                } as EmbedAuthorOptions);
-            } else {
-                embedBuilder.setColor(embedColours.WARNING).setAuthor({
-                    name: '❌ There are no songs in the queue',
-                } as EmbedAuthorOptions);
-            }
-
-            await interaction.reply({
-                embeds: [embedBuilder],
-            });
+            queue.delete();
+            embedBuilder.setColor(embedColours.INFO).setAuthor({
+                name: '⏹ Player has been stopped',
+            } as EmbedAuthorOptions);
+        } else {
+            embedBuilder.setColor(embedColours.WARNING).setAuthor({
+                name: '❌ There are no songs in the queue',
+            } as EmbedAuthorOptions);
         }
+
+        await interaction.reply({
+            embeds: [embedBuilder],
+        });
     },
 };

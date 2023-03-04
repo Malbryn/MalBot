@@ -1,16 +1,16 @@
 import {
     ChatInputCommandInteraction,
+    Client,
     SlashCommandBuilder,
     SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
-import { ExtendedClient } from '../models/ExtendedClient';
 
 export interface Command {
     data:
         | Omit<SlashCommandBuilder, 'addSubcommandGroup' | 'addSubcommand'>
         | SlashCommandSubcommandsOnlyBuilder;
     run: (
-        client: ExtendedClient,
+        client: Client,
         interaction: ChatInputCommandInteraction
     ) => Promise<void>;
 }

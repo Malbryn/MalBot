@@ -1,6 +1,7 @@
-import { Queue, Track } from 'discord-player';
+import { GuildQueue, Track } from 'discord-player';
 import {
     ChatInputCommandInteraction,
+    Client,
     EmbedAuthorOptions,
     EmbedBuilder,
     SlashCommandBuilder,
@@ -8,7 +9,7 @@ import {
 import { Logger } from 'tslog';
 import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
-import { ExtendedClient } from '../../models/ExtendedClient';
+import { player } from '../../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
@@ -16,25 +17,24 @@ export const Skip: Command = {
     data: new SlashCommandBuilder()
         .setName('skip')
         .setDescription('Skips the current song.'),
-    async run(
-        client: ExtendedClient,
-        interaction: ChatInputCommandInteraction
-    ) {
+    async run(client: Client, interaction: ChatInputCommandInteraction) {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {
-            const queue: Queue | undefined = client.player?.getQueue(guildId);
+            const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
             const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
             if (queue) {
                 logger.debug('Skipping current song');
 
-                const currentSong: Track = queue.current;
+                const currentSong: Track | null = queue.currentTrack;
 
-                queue.skip();
-                embedBuilder.setColor(embedColours.INFO).setAuthor({
-                    name: `⏭ Skipped ${currentSong.title}`,
-                } as EmbedAuthorOptions);
+                if (currentSong) {
+                    queue.node.skip();
+                    embedBuilder.setColor(embedColours.INFO).setAuthor({
+                        name: `⏭ Skipped ${currentSong.title}`,
+                    } as EmbedAuthorOptions);
+                }
             } else {
                 embedBuilder;
                 embedBuilder.setColor(embedColours.WARNING).setAuthor({

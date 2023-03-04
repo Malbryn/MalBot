@@ -3,12 +3,16 @@ import {
     EmbedBuilder,
     SlashCommandIntegerOption,
 } from '@discordjs/builders';
-import { Queue } from 'discord-player';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { GuildQueue } from 'discord-player';
+import {
+    ChatInputCommandInteraction,
+    Client,
+    SlashCommandBuilder,
+} from 'discord.js';
+import { Logger } from 'tslog';
 import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
-import { ExtendedClient } from '../../models/ExtendedClient';
-import { Logger } from 'tslog';
+import { player } from '../../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
@@ -19,22 +23,19 @@ export const Seek: Command = {
         .addIntegerOption((option: SlashCommandIntegerOption) =>
             option.setName('time').setDescription('Time').setRequired(true)
         ),
-    async run(
-        client: ExtendedClient,
-        interaction: ChatInputCommandInteraction
-    ) {
+    async run(client: Client, interaction: ChatInputCommandInteraction) {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {
-            const queue: Queue | undefined = client.player?.getQueue(guildId);
+            const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
             const embedBuilder: EmbedBuilder = new EmbedBuilder();
             const seekTime: number | null =
                 interaction.options.getInteger('time');
 
             if (queue && seekTime) {
-                logger.debug(`Seeking [Time: ${seekTime}]`);
+                logger.debug(`Seeking [Time: ${seekTime}s]`);
 
-                await queue.seek(seekTime);
+                await queue.node.seek(seekTime);
                 embedBuilder.setColor(embedColours.INFO).setAuthor({
                     name: `⏩ Skipped to ${seekTime} seconds`,
                 } as EmbedAuthorOptions);

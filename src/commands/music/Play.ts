@@ -5,16 +5,16 @@ import {
     SlashCommandSubcommandBuilder,
 } from '@discordjs/builders';
 import {
-    Player,
-    PlayerOptions,
-    PlayerSearchResult,
+    GuildNodeCreateOptions,
+    GuildQueue,
     Playlist,
     QueryType,
-    Queue,
+    SearchResult,
     Track,
 } from 'discord-player';
 import {
     ChatInputCommandInteraction,
+    Client,
     Guild,
     GuildMember,
     SlashCommandBuilder,
@@ -23,7 +23,7 @@ import {
 import { Logger } from 'tslog';
 import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
-import { ExtendedClient } from '../../models/ExtendedClient';
+import { player } from '../../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
@@ -58,10 +58,7 @@ export const Play: Command = {
                         .setRequired(true)
                 )
         ),
-    async run(
-        client: ExtendedClient,
-        interaction: ChatInputCommandInteraction
-    ) {
+    async run(client: Client, interaction: ChatInputCommandInteraction) {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
         embedBuilder.setColor(embedColours.INFO).setAuthor({
@@ -79,7 +76,10 @@ export const Play: Command = {
         );
 
         if (voiceChannel) {
-            const queue: Queue | undefined = createQueue(client, interaction);
+            const queue: GuildQueue | undefined = createQueue(
+                client,
+                interaction
+            );
 
             if (queue) {
                 await connectToVoiceChannel(queue, voiceChannel);
@@ -88,9 +88,7 @@ export const Play: Command = {
 
                 try {
                     await handleSubcommand(
-                        client,
                         interaction,
-                        queue,
                         subcommand,
                         embedBuilder
                     );
@@ -128,7 +126,7 @@ export const Play: Command = {
 };
 
 function getVoiceChannel(
-    client: ExtendedClient,
+    client: Client,
     interaction: ChatInputCommandInteraction
 ): VoiceBasedChannel | undefined {
     const userId: string | undefined = interaction.member?.user.id;
@@ -143,7 +141,7 @@ function getVoiceChannel(
 }
 
 function getGuild(
-    client: ExtendedClient,
+    client: Client,
     interaction: ChatInputCommandInteraction
 ): Guild | undefined {
     const guildId: string | null = interaction.guildId;
@@ -152,45 +150,47 @@ function getGuild(
 }
 
 function createQueue(
-    client: ExtendedClient,
+    client: Client,
     interaction: ChatInputCommandInteraction
-): Queue | undefined {
+): GuildQueue | undefined {
     const guild: Guild | undefined = getGuild(client, interaction);
-    const queueOptions: PlayerOptions = {
+    const queueOptions: GuildNodeCreateOptions = {
+        metadata: {
+            channel: interaction.channel,
+            client: interaction.guild?.members.me,
+            requestedBy: interaction.user,
+        },
+        selfDeaf: true,
+        volume: 80,
+        leaveOnEmpty: true,
+        leaveOnEmptyCooldown: 300000,
         leaveOnEnd: false,
+        leaveOnEndCooldown: 300000,
     };
 
-    return guild ? client.player?.createQueue(guild, queueOptions) : undefined;
+    return guild ? player.nodes.create(guild, queueOptions) : undefined;
 }
 
 async function connectToVoiceChannel(
-    queue: Queue,
+    queue: GuildQueue,
     voiceChannel: VoiceBasedChannel
 ): Promise<void> {
     if (!queue.connection) await queue.connect(voiceChannel);
 }
 
 async function handleSubcommand(
-    client: ExtendedClient,
     interaction: ChatInputCommandInteraction,
-    queue: Queue,
     subcommand: string,
     embedBuilder: EmbedBuilder
 ): Promise<void> {
-    const player: Player | undefined = client.player;
-
-    if (!player) throw new Error('Player is not initialised!');
-
     if (subcommand === SUBCOMMANDS.SONG) {
-        await handleSongRequest(interaction, player, queue, embedBuilder);
+        await handleSongRequest(interaction, embedBuilder);
     } else {
-        await handlePlaylistRequest(interaction, player, queue, embedBuilder);
+        await handlePlaylistRequest(interaction, embedBuilder);
     }
 }
 async function handleSongRequest(
     interaction: ChatInputCommandInteraction,
-    player: Player,
-    queue: Queue,
     embedBuilder: EmbedBuilder
 ): Promise<void> {
     const query: string | null = interaction.options.getString('query');
@@ -201,17 +201,17 @@ async function handleSongRequest(
 
     logger.debug(`Song requested [Query: ${query}] [URL: ${isUrl}]`);
 
-    const searchEngine: QueryType = isUrl
+    const searchEngine: 'youtubeVideo' | 'youtubeSearch' = isUrl
         ? QueryType.YOUTUBE_VIDEO
         : QueryType.YOUTUBE_SEARCH;
-    const result: PlayerSearchResult = await player.search(query, {
+    const result: SearchResult = await player.search(query, {
         requestedBy: interaction.user,
         searchEngine,
     });
 
     if (result.tracks.length === 0) throw new Error('No results found!');
 
-    const song: Track = await addSongToQueue(result, queue);
+    const song: Track = await addSongToQueue(result);
 
     embedBuilder
         .setTitle(`**${song.title}**`)
@@ -226,8 +226,6 @@ async function handleSongRequest(
 
 async function handlePlaylistRequest(
     interaction: ChatInputCommandInteraction,
-    player: Player,
-    queue: Queue,
     embedBuilder: EmbedBuilder
 ) {
     const url: string | null = interaction.options.getString('url');
@@ -236,7 +234,7 @@ async function handlePlaylistRequest(
 
     logger.debug(`Playlist requested [URL: ${url}]`);
 
-    const result: PlayerSearchResult = await player.search(url, {
+    const result: SearchResult = await player.search(url, {
         requestedBy: interaction.user,
         searchEngine: QueryType.YOUTUBE_PLAYLIST,
     });
@@ -244,14 +242,15 @@ async function handlePlaylistRequest(
 
     if (tracks.length === 0) throw new Error('Playlist is not found!');
 
-    const playlist: Playlist | null = result.playlist;
+    const playlist: Playlist | null | undefined = result.playlist;
+    const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
 
-    if (playlist) {
-        queue.addTracks(tracks);
+    if (playlist && queue) {
+        queue.addTrack(tracks);
 
         logger.debug(`Playlist added to queue [Title: ${playlist.title}]`);
 
-        if (!queue.playing) await queue.play();
+        if (!queue.node.isPlaying()) await queue.node.play();
 
         embedBuilder
             .setTitle(`**${playlist.title}**`)
@@ -266,22 +265,21 @@ async function handlePlaylistRequest(
     }
 }
 
-async function addSongToQueue(
-    result: PlayerSearchResult,
-    queue: Queue
-): Promise<Track> {
-    const song: Track = result.tracks[0];
+async function addSongToQueue(result: SearchResult): Promise<Track> {
+    const track: Track = result.tracks[0];
+    const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
 
-    queue.addTrack(song);
+    if (queue) {
+        queue.addTrack(track);
 
-    logger.debug(
-        `Track added to queue [Title: ${song.title}] [Duration: ${song.duration}]`
-    );
+        logger.debug(
+            `Track added to queue [Title: ${track.title}] [Duration: ${track.duration}]`
+        );
+    } else throw new Error('Queue is not initialised!');
 
-    // TODO: 'queue.playing' is currently broken on 5.4.0
-    if (!queue.playing) await queue.play();
+    if (!queue.node.isPlaying()) await queue.node.play();
 
-    return song;
+    return track;
 }
 
 function isYoutubeUrl(query: string): boolean {

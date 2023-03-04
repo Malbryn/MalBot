@@ -1,5 +1,6 @@
 import {
     ChatInputCommandInteraction,
+    Client,
     EmbedAuthorOptions,
     EmbedBuilder,
     Message,
@@ -8,7 +9,6 @@ import {
 import { Logger } from 'tslog';
 import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
-import { ExtendedClient } from '../../models/ExtendedClient';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
@@ -16,10 +16,7 @@ export const Ping: Command = {
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Pings the bot and returns the latency.'),
-    async run(
-        client: ExtendedClient,
-        interaction: ChatInputCommandInteraction
-    ) {
+    async run(client: Client, interaction: ChatInputCommandInteraction) {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
         embedBuilder.setColor(embedColours.INFO).setAuthor({
             name: '⏱ Measuring latency...',

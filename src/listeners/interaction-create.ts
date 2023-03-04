@@ -5,7 +5,6 @@ import {
     Interaction,
 } from 'discord.js';
 import { Logger } from 'tslog';
-import { ExtendedClient } from '../models/ExtendedClient';
 import { commandMap } from '../commands/_CommandList';
 import { config } from '../config/config';
 
@@ -32,7 +31,7 @@ export const onInteraction = async (
         );
 
         await command.run(
-            client as ExtendedClient,
+            client as Client,
             interaction as ChatInputCommandInteraction
         );
     }
