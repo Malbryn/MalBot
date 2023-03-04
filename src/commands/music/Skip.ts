@@ -33,7 +33,7 @@ export const Skip: Command = {
 
                 queue.skip();
                 embedBuilder.setColor(embedColours.INFO).setAuthor({
-                    name: `⏩ Skipped ${currentSong.title}`,
+                    name: `⏭ Skipped ${currentSong.title}`,
                 } as EmbedAuthorOptions);
             } else {
                 embedBuilder;
