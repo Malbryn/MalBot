@@ -1,6 +1,6 @@
 import { Command } from '../interfaces/Command';
 import { Ping } from './misc';
-import { Pause, Play, Queue, Resume, Skip, Stop } from './music';
+import { Pause, Play, Queue, Resume, Seek, Skip, Stop } from './music';
 
 export const commandMap: Map<string, Command> = new Map<string, Command>();
 
@@ -11,6 +11,7 @@ commandMap.set(Resume.data.name, Resume);
 commandMap.set(Skip.data.name, Skip);
 commandMap.set(Queue.data.name, Queue);
 commandMap.set(Stop.data.name, Stop);
+commandMap.set(Seek.data.name, Seek);
 
 // Misc
 commandMap.set(Ping.data.name, Ping);
