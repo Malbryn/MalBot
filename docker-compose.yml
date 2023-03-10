@@ -1,6 +1,10 @@
 version: '3'
 
 services:
-  client:
+  app:
     build: .
     command: npm run start
+    volumes:
+      - type: bind
+        source: /var/malbot/config.json
+        target: config.json
