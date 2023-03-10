@@ -5,5 +5,5 @@ services:
     command: npm run start
     volumes:
       - type: bind
-        source: /var/malbot
+        source: /srv/malbot
         target: /opt/app
