@@ -1,10 +1,12 @@
 {
     "name": "malbot",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "A basic Discord bot written in TypeScript",
     "main": "index.js",
     "scripts": {
-        "start": "ts-node src/main.ts"
+        "build": "tsc -b",
+        "start:dev": "ts-node src/main.ts",
+        "start:prod": "npm run build && node dist/src/main.js"
     },
     "repository": {
         "type": "git",

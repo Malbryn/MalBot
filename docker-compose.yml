@@ -1,9 +1,8 @@
 version: '3.9'
 services:
   app:
+    container_name: malbot
     build: .
-    command: npm run start
+    command: npm run start:prod
     volumes:
-      - type: bind
-        source: /srv/malbot
-        target: /opt/app
+      - /srv/malbot/config:/usr/app/config
