@@ -1,5 +1,6 @@
 import { RGBTuple } from 'discord.js';
-import * as appConfig from '../../config/config.json';
+
+const appConfig = require('../../config/config.json');
 
 export const config = {
     DISCORD_TOKEN: appConfig.client.discordToken,

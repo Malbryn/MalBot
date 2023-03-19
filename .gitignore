@@ -131,3 +131,7 @@ dist
 
 # Config
 config.json
+
+# Build scripts
+*.bat
+*.sh

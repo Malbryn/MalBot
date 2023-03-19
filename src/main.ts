@@ -11,6 +11,8 @@ import handleInteractionCreate from './listeners/interaction-create';
 const logger = new Logger(config.LOGGER_SETTINGS);
 
 logger.info('Starting bot...');
+logger.info(`Version ${process.env.npm_package_version}`);
+logger.info(`Guild ID: ${config.GUILD_ID}`);
 
 // Initialise client
 const client: Client = new Client({
