@@ -1,6 +1,7 @@
 import { Command } from '../interfaces/Command';
 import { Ping } from './misc';
 import { Pause, Play, Queue, Resume, Seek, Skip, Stop } from './music';
+import { Create } from './server_info';
 
 export const commandMap: Map<string, Command> = new Map<string, Command>();
 
@@ -15,3 +16,6 @@ commandMap.set(Seek.data.name, Seek);
 
 // Misc
 commandMap.set(Ping.data.name, Ping);
+
+// Server info
+commandMap.set(Create.data.name, Create);
