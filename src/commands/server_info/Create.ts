@@ -26,7 +26,7 @@ export const Create: Command = {
             .setTitle('Create new server info panel');
 
         const ip = new TextInputBuilder()
-            .setCustomId('ServerIP')
+            .setCustomId('serverIP')
             .setLabel('IP')
             .setStyle(TextInputStyle.Short)
             .setPlaceholder('Server IP')
@@ -35,7 +35,7 @@ export const Create: Command = {
             .setRequired(true);
 
         const port = new TextInputBuilder()
-            .setCustomId('ServerPort')
+            .setCustomId('serverPort')
             .setLabel('Port')
             .setStyle(TextInputStyle.Short)
             .setPlaceholder('Server port')
@@ -44,14 +44,14 @@ export const Create: Command = {
             .setRequired(true);
 
         const modset = new TextInputBuilder()
-            .setCustomId('Modset')
+            .setCustomId('modset')
             .setLabel('Modset link (Optional)')
             .setStyle(TextInputStyle.Short)
             .setPlaceholder('Link to modset')
             .setRequired(false);
 
         const password = new TextInputBuilder()
-            .setCustomId('Password')
+            .setCustomId('password')
             .setLabel('Server password (Optional)')
             .setStyle(TextInputStyle.Short)
             .setPlaceholder('Server password')

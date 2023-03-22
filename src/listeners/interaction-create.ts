@@ -46,7 +46,7 @@ export const onInteraction = async (
         const modal: Modal | undefined = modalMap.get(interaction.customId);
 
         if (modal) {
-            logger.debug(`Handling modal [${interaction.customId}]`);
+            logger.debug(`Handling modal: ${interaction.customId}`);
 
             await modal.run(
                 client as Client,

@@ -2,11 +2,14 @@ export {};
 
 import { Player } from 'discord-player';
 import { ActivityType, Client, GatewayIntentBits } from 'discord.js';
+import { Model, ModelStatic, Sequelize } from 'sequelize';
 import { Logger } from 'tslog';
 import { Filter, downloadOptions } from 'ytdl-core';
 import { config } from './config/config';
+import { createServerInfoTable, initDatabase } from './lib/database';
 import handleClientReady from './listeners/client-ready';
 import handleInteractionCreate from './listeners/interaction-create';
+import { ServerInfo } from './interfaces/ServerInfo';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
@@ -22,8 +25,14 @@ const client: Client = new Client({
     },
 });
 
+// Initialise events
 handleClientReady(client);
 handleInteractionCreate(client);
+
+// Connect to database
+const sequelize: Sequelize = initDatabase();
+export const serverInfoModel: ModelStatic<Model<ServerInfo>> =
+    createServerInfoTable(sequelize);
 
 // Initialise music player
 const ytdlOptions: Partial<downloadOptions> = {

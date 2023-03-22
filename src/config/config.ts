@@ -7,6 +7,7 @@ export const config = {
     GUILD_ID: appConfig.client.guildID,
     CLIENT_ID: appConfig.client.clientID,
     LOGGER_SETTINGS: appConfig.loggerSettings,
+    DATABASE_PATH: appConfig.database.path,
     MUSIC_QUALITY: appConfig.music.quality,
     MUSIC_FILTER: appConfig.music.filter,
     MUSIC_LIVE_BUFFER: appConfig.music.liveBuffer,
