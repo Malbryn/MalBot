@@ -1,6 +1,6 @@
 {
     "name": "malbot",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "description": "A basic Discord bot written in TypeScript",
     "main": "index.js",
     "scripts": {
@@ -25,7 +25,7 @@
         "@discordjs/builders": "^1.4.0",
         "@discordjs/opus": "^0.9.0",
         "@discordjs/rest": "^1.5.0",
-        "@discordjs/voice": "^0.14.0",
+        "@discordjs/voice": "^0.16.0",
         "@types/node": "^18.14.0",
         "discord-api-types": "^0.37.35",
         "discord-player": "^6.0.0",
@@ -35,6 +35,7 @@
         "sqlite3": "^5.1.6",
         "ts-node": "^10.9.1",
         "tslog": "^4.7.4",
-        "typescript": "^4.9.5"
+        "typescript": "^4.9.5",
+        "ytdl-core": "4.9.1"
     }
 }
