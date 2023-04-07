@@ -1,21 +1,29 @@
 import { Command } from '../interfaces/Command';
-import { Ping } from './misc';
-import { Pause, Play, Queue, Resume, Seek, Skip, Stop } from './music';
-import { Create } from './server_info';
+import { PingCommand } from './misc';
+import {
+    PauseCommand,
+    PlayCommand,
+    QueueCommand,
+    ResumeCommand,
+    SeekCommand,
+    SkipCommand,
+    StopCommand,
+} from './music';
+import { CreateServerCommand } from './server_info';
 
 export const commandMap: Map<string, Command> = new Map<string, Command>();
 
 // Music
-commandMap.set(Play.data.name, Play);
-commandMap.set(Pause.data.name, Pause);
-commandMap.set(Resume.data.name, Resume);
-commandMap.set(Skip.data.name, Skip);
-commandMap.set(Queue.data.name, Queue);
-commandMap.set(Stop.data.name, Stop);
-commandMap.set(Seek.data.name, Seek);
+commandMap.set(PlayCommand.data.name, PlayCommand);
+commandMap.set(PauseCommand.data.name, PauseCommand);
+commandMap.set(ResumeCommand.data.name, ResumeCommand);
+commandMap.set(SkipCommand.data.name, SkipCommand);
+commandMap.set(QueueCommand.data.name, QueueCommand);
+commandMap.set(StopCommand.data.name, StopCommand);
+commandMap.set(SeekCommand.data.name, SeekCommand);
 
 // Misc
-commandMap.set(Ping.data.name, Ping);
+commandMap.set(PingCommand.data.name, PingCommand);
 
 // Server info
-commandMap.set(Create.data.name, Create);
+commandMap.set(CreateServerCommand.data.name, CreateServerCommand);

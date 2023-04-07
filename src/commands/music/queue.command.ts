@@ -14,7 +14,7 @@ import { player } from '../../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-export const Queue: Command = {
+export const QueueCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('queue')
         .setDescription('Shows the first 5 songs in the queue.'),
@@ -63,7 +63,7 @@ export const Queue: Command = {
                         ? currentTrack.thumbnail
                         : '';
                     const fields: APIEmbedField[] = [
-                        { name: 'Queue', value: queueString },
+                        { name: 'QueueCommand', value: queueString },
                     ];
 
                     embedBuilder

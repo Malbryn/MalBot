@@ -1,9 +1,12 @@
+import {
+    EmbedAuthorOptions,
+    EmbedBuilder,
+    SlashCommandIntegerOption,
+} from '@discordjs/builders';
 import { GuildQueue } from 'discord-player';
 import {
     ChatInputCommandInteraction,
     Client,
-    EmbedAuthorOptions,
-    EmbedBuilder,
     SlashCommandBuilder,
 } from 'discord.js';
 import { Logger } from 'tslog';
@@ -13,10 +16,13 @@ import { player } from '../../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-export const Resume: Command = {
+export const SeekCommand: Command = {
     data: new SlashCommandBuilder()
-        .setName('resume')
-        .setDescription('Resumes the current song.'),
+        .setName('seek')
+        .setDescription('Seeks to the given time.')
+        .addIntegerOption((option: SlashCommandIntegerOption) =>
+            option.setName('time').setDescription('Time').setRequired(true)
+        ),
     async run(
         client: Client,
         interaction: ChatInputCommandInteraction
@@ -26,13 +32,15 @@ export const Resume: Command = {
         if (guildId) {
             const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
             const embedBuilder: EmbedBuilder = new EmbedBuilder();
+            const seekTime: number | null =
+                interaction.options.getInteger('time');
 
-            if (queue) {
-                logger.debug('Resuming player');
+            if (queue && seekTime) {
+                logger.debug(`Seeking [Time: ${seekTime}s]`);
 
-                queue.node.resume();
+                await queue.node.seek(seekTime);
                 embedBuilder.setColor(embedColours.INFO).setAuthor({
-                    name: '▶️ Player has been resumed',
+                    name: `⏩ Skipped to ${seekTime} seconds`,
                 } as EmbedAuthorOptions);
             } else {
                 embedBuilder.setColor(embedColours.WARNING).setAuthor({

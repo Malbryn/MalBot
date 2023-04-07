@@ -1,4 +1,4 @@
-import { GuildQueue, Track } from 'discord-player';
+import { GuildQueue } from 'discord-player';
 import {
     ChatInputCommandInteraction,
     Client,
@@ -13,10 +13,10 @@ import { player } from '../../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-export const Skip: Command = {
+export const PauseCommand: Command = {
     data: new SlashCommandBuilder()
-        .setName('skip')
-        .setDescription('Skips the current song.'),
+        .setName('pause')
+        .setDescription('Pauses the current song.'),
     async run(
         client: Client,
         interaction: ChatInputCommandInteraction
@@ -28,16 +28,12 @@ export const Skip: Command = {
             const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
             if (queue) {
-                logger.debug('Skipping current song');
+                logger.debug('Pausing player');
 
-                const currentSong: Track | null = queue.currentTrack;
-
-                if (currentSong) {
-                    queue.node.skip();
-                    embedBuilder.setColor(embedColours.INFO).setAuthor({
-                        name: `⏭ Skipped ${currentSong.title}`,
-                    } as EmbedAuthorOptions);
-                }
+                queue.node.pause();
+                embedBuilder.setColor(embedColours.INFO).setAuthor({
+                    name: '⏸ Player has been paused',
+                } as EmbedAuthorOptions);
             } else {
                 embedBuilder.setColor(embedColours.WARNING).setAuthor({
                     name: '❌ There are no songs in the queue',

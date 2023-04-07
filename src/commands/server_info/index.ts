@@ -1,1 +1,1 @@
-export * from './Create';
+export * from './create-server.command';

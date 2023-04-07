@@ -16,7 +16,7 @@ import { Command } from '../../interfaces/Command';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-export const Create: Command = {
+export const CreateServerCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('create_server_info_panel')
         .setDescription('Creates the server info panel.'),
@@ -26,7 +26,7 @@ export const Create: Command = {
     ): Promise<void> {
         const modal: ModalBuilder = new ModalBuilder()
             .setCustomId('CreateServerInfoModal')
-            .setTitle('Create new server info panel');
+            .setTitle('CreateServerCommand new server info panel');
 
         const ip: TextInputBuilder = new TextInputBuilder()
             .setCustomId('serverIP')

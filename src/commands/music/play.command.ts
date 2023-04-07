@@ -32,7 +32,7 @@ enum SUBCOMMANDS {
     PLAYLIST = 'playlist',
 }
 
-export const Play: Command = {
+export const PlayCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('play')
         .setDescription('Plays a song or playlist.')
@@ -278,7 +278,7 @@ async function addSongToQueue(result: SearchResult): Promise<Track> {
         logger.debug(
             `Track added to queue [Title: ${track.title}] [Duration: ${track.duration}]`
         );
-    } else throw new Error('Queue is not initialised!');
+    } else throw new Error('QueueCommand is not initialised!');
 
     if (!queue.node.isPlaying()) await queue.node.play();
 

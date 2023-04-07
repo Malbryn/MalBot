@@ -13,7 +13,7 @@ import { player } from '../../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-export const Stop: Command = {
+export const StopCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('stop')
         .setDescription(

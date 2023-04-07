@@ -12,7 +12,7 @@ import { Command } from '../../interfaces/Command';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-export const Ping: Command = {
+export const PingCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Pings the bot and returns the latency.'),
