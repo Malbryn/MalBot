@@ -1,10 +1,9 @@
 import { EmbedBuilder } from '@discordjs/builders';
-import { Client, ModalSubmitInteraction } from 'discord.js';
-import { Model } from 'sequelize';
+import { Client, Message, ModalSubmitInteraction } from 'discord.js';
 import { embedColours } from '../../config/config';
 import { Modal } from '../../interfaces/Modal';
 import { ServerInfo } from '../../interfaces/ServerInfo';
-import { serverInfoModel } from '../../main';
+import { DatabaseService } from '../../lib/database.service';
 
 export const CreateServerModal: Modal = {
     data: { name: 'CreateServerInfoModal' },
@@ -12,21 +11,9 @@ export const CreateServerModal: Modal = {
         client: Client,
         interaction: ModalSubmitInteraction
     ): Promise<void> {
-        // CreateServerCommand new database record
-        const serverInfo: ServerInfo = {
-            ip: interaction.fields.getTextInputValue('serverIP'),
-            port: interaction.fields.getTextInputValue('serverPort'),
-            password: interaction.fields.getTextInputValue('password'),
-            modset: interaction.fields.getTextInputValue('modset'),
-        };
+        await interaction.reply('Creating new server info panel...');
 
-        const record: Model<ServerInfo> = await serverInfoModel.create(
-            serverInfo
-        );
-
-        await interaction.reply('asd');
-
-        // CreateServerCommand new embed
+        // Create new embed
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
         embedBuilder
@@ -39,6 +26,23 @@ export const CreateServerModal: Modal = {
                 { name: 'Player list', value: '```4```' }
             );
 
-        await interaction.channel?.send({ embeds: [embedBuilder] });
+        await interaction.deleteReply();
+        const message: Message | undefined = await interaction.channel?.send({
+            embeds: [embedBuilder],
+        });
+
+        if (message) {
+            const serverInfo: ServerInfo = {
+                ip: interaction.fields.getTextInputValue('serverIP'),
+                port: interaction.fields.getTextInputValue('serverPort'),
+                password: interaction.fields.getTextInputValue('password'),
+                modset: interaction.fields.getTextInputValue('modset'),
+                embedId: message.id,
+            };
+
+            const databaseService: DatabaseService =
+                DatabaseService.getInstance();
+            await databaseService.serverInfoModel.create(serverInfo);
+        }
     },
 };
