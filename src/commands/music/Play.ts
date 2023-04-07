@@ -58,7 +58,10 @@ export const Play: Command = {
                         .setRequired(true)
                 )
         ),
-    async run(client: Client, interaction: ChatInputCommandInteraction) {
+    async run(
+        client: Client,
+        interaction: ChatInputCommandInteraction
+    ): Promise<void> {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
         embedBuilder.setColor(embedColours.INFO).setAuthor({

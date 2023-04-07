@@ -17,7 +17,10 @@ export const Resume: Command = {
     data: new SlashCommandBuilder()
         .setName('resume')
         .setDescription('Resumes the current song.'),
-    async run(client: Client, interaction: ChatInputCommandInteraction) {
+    async run(
+        client: Client,
+        interaction: ChatInputCommandInteraction
+    ): Promise<void> {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {

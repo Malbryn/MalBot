@@ -18,7 +18,10 @@ export const Queue: Command = {
     data: new SlashCommandBuilder()
         .setName('queue')
         .setDescription('Shows the first 5 songs in the queue.'),
-    async run(client: Client, interaction: ChatInputCommandInteraction) {
+    async run(
+        client: Client,
+        interaction: ChatInputCommandInteraction
+    ): Promise<void> {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {
@@ -26,7 +29,7 @@ export const Queue: Command = {
             const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
             if (queue) {
-                const tracks = queue.tracks.store;
+                const tracks: Track[] = queue.tracks.store;
 
                 logger.debug('Current queue lenght: ', tracks.length);
 

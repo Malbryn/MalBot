@@ -16,7 +16,10 @@ export const Ping: Command = {
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Pings the bot and returns the latency.'),
-    async run(client: Client, interaction: ChatInputCommandInteraction) {
+    async run(
+        client: Client,
+        interaction: ChatInputCommandInteraction
+    ): Promise<void> {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
         embedBuilder.setColor(embedColours.INFO).setAuthor({
             name: '⏱ Measuring latency...',

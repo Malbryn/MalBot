@@ -24,7 +24,7 @@ export default (client: Client): void => {
 export const onInteraction = async (
     client: Client,
     interaction: Interaction
-) => {
+): Promise<void> => {
     if (interaction.isCommand()) {
         const command: Command | undefined = commandMap.get(
             interaction.commandName

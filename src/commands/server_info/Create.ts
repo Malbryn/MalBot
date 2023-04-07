@@ -20,12 +20,15 @@ export const Create: Command = {
     data: new SlashCommandBuilder()
         .setName('create_server_info_panel')
         .setDescription('Creates the server info panel.'),
-    async run(client: Client, interaction: ChatInputCommandInteraction) {
-        const modal = new ModalBuilder()
+    async run(
+        client: Client,
+        interaction: ChatInputCommandInteraction
+    ): Promise<void> {
+        const modal: ModalBuilder = new ModalBuilder()
             .setCustomId('CreateServerInfoModal')
             .setTitle('Create new server info panel');
 
-        const ip = new TextInputBuilder()
+        const ip: TextInputBuilder = new TextInputBuilder()
             .setCustomId('serverIP')
             .setLabel('IP')
             .setStyle(TextInputStyle.Short)
@@ -34,7 +37,7 @@ export const Create: Command = {
             .setMaxLength(15)
             .setRequired(true);
 
-        const port = new TextInputBuilder()
+        const port: TextInputBuilder = new TextInputBuilder()
             .setCustomId('serverPort')
             .setLabel('Port')
             .setStyle(TextInputStyle.Short)
@@ -43,33 +46,33 @@ export const Create: Command = {
             .setMaxLength(5)
             .setRequired(true);
 
-        const modset = new TextInputBuilder()
+        const modset: TextInputBuilder = new TextInputBuilder()
             .setCustomId('modset')
             .setLabel('Modset link (Optional)')
             .setStyle(TextInputStyle.Short)
             .setPlaceholder('Link to modset')
             .setRequired(false);
 
-        const password = new TextInputBuilder()
+        const password: TextInputBuilder = new TextInputBuilder()
             .setCustomId('password')
             .setLabel('Server password (Optional)')
             .setStyle(TextInputStyle.Short)
             .setPlaceholder('Server password')
             .setRequired(false);
 
-        const ipAction =
+        const ipAction: ActionRowBuilder<TextInputBuilder> =
             new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                 ip
             );
-        const portAction =
+        const portAction: ActionRowBuilder<TextInputBuilder> =
             new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                 port
             );
-        const modsetAction =
+        const modsetAction: ActionRowBuilder<TextInputBuilder> =
             new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                 modset
             );
-        const passwordAction =
+        const passwordAction: ActionRowBuilder<TextInputBuilder> =
             new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                 password
             );

@@ -17,7 +17,10 @@ export const Skip: Command = {
     data: new SlashCommandBuilder()
         .setName('skip')
         .setDescription('Skips the current song.'),
-    async run(client: Client, interaction: ChatInputCommandInteraction) {
+    async run(
+        client: Client,
+        interaction: ChatInputCommandInteraction
+    ): Promise<void> {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {
@@ -36,7 +39,6 @@ export const Skip: Command = {
                     } as EmbedAuthorOptions);
                 }
             } else {
-                embedBuilder;
                 embedBuilder.setColor(embedColours.WARNING).setAuthor({
                     name: '❌ There are no songs in the queue',
                 } as EmbedAuthorOptions);

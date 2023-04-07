@@ -17,7 +17,10 @@ export const Pause: Command = {
     data: new SlashCommandBuilder()
         .setName('pause')
         .setDescription('Pauses the current song.'),
-    async run(client: Client, interaction: ChatInputCommandInteraction) {
+    async run(
+        client: Client,
+        interaction: ChatInputCommandInteraction
+    ): Promise<void> {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {

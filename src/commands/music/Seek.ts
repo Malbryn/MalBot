@@ -23,7 +23,10 @@ export const Seek: Command = {
         .addIntegerOption((option: SlashCommandIntegerOption) =>
             option.setName('time').setDescription('Time').setRequired(true)
         ),
-    async run(client: Client, interaction: ChatInputCommandInteraction) {
+    async run(
+        client: Client,
+        interaction: ChatInputCommandInteraction
+    ): Promise<void> {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {
