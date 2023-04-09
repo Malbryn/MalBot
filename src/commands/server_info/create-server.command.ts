@@ -46,6 +46,13 @@ export const CreateServerCommand: Command = {
             .setMaxLength(5)
             .setRequired(true);
 
+        const game: TextInputBuilder = new TextInputBuilder()
+            .setCustomId('game')
+            .setLabel('Game')
+            .setStyle(TextInputStyle.Short)
+            .setPlaceholder('arma3')
+            .setRequired(true);
+
         const modset: TextInputBuilder = new TextInputBuilder()
             .setCustomId('modset')
             .setLabel('Modset link (Optional)')
@@ -68,6 +75,10 @@ export const CreateServerCommand: Command = {
             new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                 port
             );
+        const gameAction: ActionRowBuilder<TextInputBuilder> =
+            new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+                game
+            );
         const modsetAction: ActionRowBuilder<TextInputBuilder> =
             new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
                 modset
@@ -77,7 +88,13 @@ export const CreateServerCommand: Command = {
                 password
             );
 
-        modal.addComponents(ipAction, portAction, modsetAction, passwordAction);
+        modal.addComponents(
+            ipAction,
+            portAction,
+            gameAction,
+            modsetAction,
+            passwordAction
+        );
 
         await interaction.showModal(modal);
     },

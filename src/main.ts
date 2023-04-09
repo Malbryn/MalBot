@@ -1,4 +1,4 @@
-import { DatabaseService } from './lib/database.service';
+import { DatabaseService } from './services/database.service';
 import { Player } from 'discord-player';
 import { ActivityType, Client, GatewayIntentBits } from 'discord.js';
 import { Logger } from 'tslog';
@@ -6,6 +6,7 @@ import { downloadOptions, Filter } from 'ytdl-core';
 import { config } from './config/config';
 import handleClientReady from './listeners/client-ready';
 import handleInteractionCreate from './listeners/interaction-create';
+import { ServerMonitoringService } from './services/server-monitoring.service';
 
 export {};
 
@@ -28,6 +29,9 @@ handleClientReady(client);
 handleInteractionCreate(client);
 
 const databaseService: DatabaseService = DatabaseService.getInstance();
+const serverMonitoringService: ServerMonitoringService =
+    ServerMonitoringService.getInstance();
+serverMonitoringService.start();
 
 // Initialise music player
 const ytdlOptions: Partial<downloadOptions> = {

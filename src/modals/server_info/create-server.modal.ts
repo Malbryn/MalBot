@@ -3,7 +3,8 @@ import { Client, Message, ModalSubmitInteraction } from 'discord.js';
 import { embedColours } from '../../config/config';
 import { Modal } from '../../interfaces/Modal';
 import { ServerInfo } from '../../interfaces/ServerInfo';
-import { DatabaseService } from '../../lib/database.service';
+import { DatabaseService } from '../../services/database.service';
+import { ServerMonitoringService } from '../../services/server-monitoring.service';
 
 export const CreateServerModal: Modal = {
     data: { name: 'CreateServerInfoModal' },
@@ -20,11 +21,13 @@ export const CreateServerModal: Modal = {
             .setTitle('Server Info')
             .setColor(embedColours.INFO)
             .addFields(
-                { name: 'Details', value: '```1```' },
-                { name: 'Modset', value: '```2```' },
-                { name: 'Player count', value: '```3```' },
-                { name: 'Player list', value: '```4```' }
-            );
+                { name: 'Connection details', value: '``````' },
+                { name: 'Modset', value: '``````' },
+                { name: 'Player count', value: '``````' },
+                { name: 'Player list', value: '``````' },
+                { name: 'Status', value: '``' }
+            )
+            .setFooter({ text: 'Last update: ' });
 
         await interaction.deleteReply();
         const message: Message | undefined = await interaction.channel?.send({
@@ -35,6 +38,7 @@ export const CreateServerModal: Modal = {
             const serverInfo: ServerInfo = {
                 ip: interaction.fields.getTextInputValue('serverIP'),
                 port: interaction.fields.getTextInputValue('serverPort'),
+                game: interaction.fields.getTextInputValue('game'),
                 password: interaction.fields.getTextInputValue('password'),
                 modset: interaction.fields.getTextInputValue('modset'),
                 embedId: message.id,
@@ -43,6 +47,10 @@ export const CreateServerModal: Modal = {
             const databaseService: DatabaseService =
                 DatabaseService.getInstance();
             await databaseService.serverInfoModel.create(serverInfo);
+
+            const serverMonitoringService: ServerMonitoringService =
+                ServerMonitoringService.getInstance();
+            await serverMonitoringService.start();
         }
     },
 };

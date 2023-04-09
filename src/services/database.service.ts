@@ -45,6 +45,10 @@ export class DatabaseService {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
+                game: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
                 password: {
                     type: DataTypes.STRING,
                     allowNull: true,

@@ -8,6 +8,7 @@ export const config = {
     CLIENT_ID: appConfig.client.clientID,
     LOGGER_SETTINGS: appConfig.loggerSettings,
     DATABASE_PATH: appConfig.database.path,
+    SERVER_MONITORING_INTERVAL: appConfig.serverMonitoring.interval,
     MUSIC_QUALITY: appConfig.music.quality,
     MUSIC_FILTER: appConfig.music.filter,
     MUSIC_LIVE_BUFFER: appConfig.music.liveBuffer,

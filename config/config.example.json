@@ -7,6 +7,9 @@
     "loggerSettings": {
         "prettyLogTemplate": "{{dateIsoStr}} {{logLevelName}}\t"
     },
+    "serverMonitoring": {
+        "interval": 300
+    },
     "database": {
         "path": "../../data/malbot.db"
     },
