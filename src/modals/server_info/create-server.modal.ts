@@ -19,15 +19,8 @@ export const CreateServerModal: Modal = {
 
         embedBuilder
             .setTitle('Server Info')
-            .setColor(embedColours.INFO)
-            .addFields(
-                { name: 'Connection details', value: '``````' },
-                { name: 'Modset', value: '``````' },
-                { name: 'Player count', value: '``````' },
-                { name: 'Player list', value: '``````' },
-                { name: 'Status', value: '``' }
-            )
-            .setFooter({ text: 'Last update: ' });
+            .setColor(embedColours.WARNING)
+            .setDescription('```Fetching data...```');
 
         await interaction.deleteReply();
         const message: Message | undefined = await interaction.channel?.send({
@@ -40,6 +33,7 @@ export const CreateServerModal: Modal = {
             );
 
             const serverInfo: ServerInfo = {
+                id: 1,
                 ip: interaction.fields.getTextInputValue('serverIP'),
                 port: portNumber,
                 game: interaction.fields.getTextInputValue('game'),
@@ -53,6 +47,10 @@ export const CreateServerModal: Modal = {
 
             const serverMonitoringService: ServerMonitoringService =
                 ServerMonitoringService.getInstance();
+
+            if (serverMonitoringService.isRunning())
+                serverMonitoringService.stop();
+
             await serverMonitoringService.start();
         }
     },

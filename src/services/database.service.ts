@@ -30,7 +30,7 @@ export class DatabaseService {
         if (this.serverInfoModel) {
             this.logger.info('Saving server info');
 
-            await this.serverInfoModel.create(serverInfo);
+            await this.serverInfoModel.upsert(serverInfo);
         } else
             throw new Error(
                 "Couldn't save server info because the model is undefined"

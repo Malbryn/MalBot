@@ -2,10 +2,9 @@ import { Logger } from 'tslog';
 import { config, embedColours } from '../config/config';
 import Gamedig, { Type } from 'gamedig';
 import { ServerInfo } from '../interfaces/ServerInfo';
-import { DatabaseService } from './database.service';
 import { Model } from 'sequelize';
 import { ServerQueryResult } from '../interfaces/ServerQueryResult';
-import { client } from '../main';
+import { client, databaseService } from '../main';
 import { Collection, EmbedBuilder, Message, TextChannel } from 'discord.js';
 
 export class ServerMonitoringService {
@@ -82,12 +81,13 @@ export class ServerMonitoringService {
     }
 
     private async getServerInfoFromDatabase(): Promise<ServerInfo> {
-        const databaseService: DatabaseService = DatabaseService.getInstance();
         const serverInfo: Model<ServerInfo, ServerInfo> | null =
             await databaseService.getServerInfo();
 
         if (serverInfo) {
-            this.logger.debug('Server info found: ', serverInfo.dataValues);
+            this.logger.debug(
+                `Server info found [ID: ${serverInfo.dataValues.id}] [Game: ${serverInfo.dataValues.game}] [Address: ${serverInfo.dataValues.ip}:${serverInfo.dataValues.port}]`
+            );
 
             return serverInfo.dataValues;
         } else throw new Error('Server info is not found in database');
