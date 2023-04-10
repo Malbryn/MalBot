@@ -11,10 +11,11 @@ import { modalMap } from '../modals/_ModalList';
 import { Logger } from 'tslog';
 import { commandMap } from '../commands/_CommandList';
 import { config } from '../config/config';
+import { client } from '../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-export default (client: Client): void => {
+export default (): void => {
     client.on(
         Events.InteractionCreate,
         async (interaction) => await onInteraction(client, interaction)

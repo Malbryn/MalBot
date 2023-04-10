@@ -17,7 +17,7 @@ logger.info(`Version ${process.env.npm_package_version}`);
 logger.info(`Guild ID: ${config.GUILD_ID}`);
 
 // Initialise client
-const client: Client = new Client({
+export const client: Client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
     presence: {
         activities: [
@@ -26,9 +26,9 @@ const client: Client = new Client({
     },
 });
 
-// Initialise events
-handleClientReady(client);
-handleInteractionCreate(client);
+// Initialise event listeners
+handleClientReady();
+handleInteractionCreate();
 
 const databaseService: DatabaseService = DatabaseService.getInstance();
 const serverMonitoringService: ServerMonitoringService =

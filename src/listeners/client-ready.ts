@@ -1,5 +1,4 @@
 import {
-    Client,
     Events,
     REST,
     RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -9,10 +8,11 @@ import { Logger } from 'tslog';
 import { commandMap } from '../commands/_CommandList';
 import { config } from '../config/config';
 import { Command } from '../interfaces/Command';
+import { client } from '../main';
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-export default (client: Client): void => {
+export default (): void => {
     client.once(Events.ClientReady, async (): Promise<void> => {
         if (!client.user || !client.application) {
             return;
