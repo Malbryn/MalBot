@@ -18,7 +18,7 @@ export default (): void => {
             return;
         }
 
-        logger.info('Registering commands...');
+        logger.info('Registering commands');
 
         const rest: REST = new REST({ version: '10' }).setToken(
             config.DISCORD_TOKEN

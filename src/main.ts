@@ -12,7 +12,7 @@ export {};
 
 const logger = new Logger(config.LOGGER_SETTINGS);
 
-logger.info('Starting bot...');
+logger.info('Starting bot');
 logger.info(`Version ${process.env.npm_package_version}`);
 logger.info(`Guild ID: ${config.GUILD_ID}`);
 
@@ -44,7 +44,7 @@ const ytdlOptions: Partial<downloadOptions> = {
     dlChunkSize: config.MUSIC_DOWNLOAD_CHUNK_SIZE,
 };
 
-export const player = Player.singleton(client, { ytdlOptions });
+export const player: Player = Player.singleton(client, { ytdlOptions });
 
 logger.debug('Initialised music player: ', player.options.ytdlOptions);
 
