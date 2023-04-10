@@ -3,8 +3,7 @@ import { Client, Message, ModalSubmitInteraction } from 'discord.js';
 import { embedColours } from '../../config/config';
 import { Modal } from '../../interfaces/Modal';
 import { ServerInfo } from '../../interfaces/ServerInfo';
-import { ServerMonitoringService } from '../../services/server-monitoring.service';
-import { databaseService } from '../../main';
+import { databaseService, serverMonitoringService } from '../../main';
 
 export const CreateServerModal: Modal = {
     data: { name: 'CreateServerInfoModal' },
@@ -44,9 +43,6 @@ export const CreateServerModal: Modal = {
             };
 
             await databaseService.saveServerInfo(serverInfo);
-
-            const serverMonitoringService: ServerMonitoringService =
-                ServerMonitoringService.getInstance();
 
             if (serverMonitoringService.isRunning())
                 serverMonitoringService.stop();

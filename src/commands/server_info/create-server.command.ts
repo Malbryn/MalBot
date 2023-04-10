@@ -26,7 +26,7 @@ export const CreateServerCommand: Command = {
     ): Promise<void> {
         const modal: ModalBuilder = new ModalBuilder()
             .setCustomId('CreateServerInfoModal')
-            .setTitle('CreateServerCommand new server info panel');
+            .setTitle('Create new server info panel');
 
         const ip: TextInputBuilder = new TextInputBuilder()
             .setCustomId('serverIP')
@@ -50,7 +50,7 @@ export const CreateServerCommand: Command = {
             .setCustomId('game')
             .setLabel('Game')
             .setStyle(TextInputStyle.Short)
-            .setPlaceholder('arma3')
+            .setPlaceholder('"arma3" | "dayz" | "spaceengineers" | "empyrion"')
             .setRequired(true);
 
         const modset: TextInputBuilder = new TextInputBuilder()

@@ -103,6 +103,7 @@ export class ServerMonitoringService {
             map: queryResult.map,
             game: queryResult.raw!['folder' as ObjectKey] ?? '',
             ping: queryResult.ping,
+            time: queryResult.raw!['time' as ObjectKey] ?? '',
             currentPlayerCount:
                 queryResult.raw!['numplayers' as ObjectKey] ?? -1,
             maxPlayerCount: queryResult.maxplayers,
@@ -138,7 +139,7 @@ export class ServerMonitoringService {
                 .setTitle('Server Info')
                 .setColor(embedColours.INFO)
                 .setFooter({
-                    text: this.createFooter(serverQueryResult),
+                    text: this.createFooter(),
                     iconURL: 'https://probot.media/tUE1WGMdwV.png',
                 })
                 .addFields(
@@ -149,10 +150,13 @@ export class ServerMonitoringService {
                             serverQueryResult
                         ),
                     },
-                    { name: 'Modset', value: serverInfo.modset ?? '-' },
                     {
-                        name: 'Player count',
-                        value: this.createPlayerCountField(serverQueryResult),
+                        name: 'Modset',
+                        value: this.createModsetField(serverInfo),
+                    },
+                    {
+                        name: 'Game info',
+                        value: this.createGameInfoField(serverQueryResult),
                     },
                     {
                         name: 'Player list',
@@ -222,12 +226,21 @@ export class ServerMonitoringService {
         `;
     }
 
-    private createPlayerCountField(
-        serverQueryResult: ServerQueryResult
-    ): string {
-        return `
-        \`\`\`\n${serverQueryResult.currentPlayerCount}/${serverQueryResult.maxPlayerCount}\`\`\`
-        `;
+    private createModsetField(serverInfo: ServerInfo): string {
+        if (!serverInfo.modset || serverInfo.modset === '') return '-';
+
+        return serverInfo.modset;
+    }
+
+    private createGameInfoField(serverQueryResult: ServerQueryResult): string {
+        const basicInfo: string = `
+        \`\`\`\nPlayers: ${serverQueryResult.currentPlayerCount}/${serverQueryResult.maxPlayerCount}\nPing: ${serverQueryResult.ping} ms`;
+        const gameTime: string = serverQueryResult.time
+            ? `\nTime: ${serverQueryResult.time}`
+            : '';
+        const footer: string = '```';
+
+        return basicInfo + gameTime + footer;
     }
 
     private createPlayerListField(
@@ -238,6 +251,8 @@ export class ServerMonitoringService {
         let content: string = '';
 
         for (const player of serverQueryResult.playerList) {
+            if (!player.name) break;
+
             const playerNamePadded: string = player.name.padEnd(20, ' ');
             const playerRow: string = `${playerNamePadded} | ${player.time}\n`;
 
@@ -247,12 +262,7 @@ export class ServerMonitoringService {
         return header + content + footer;
     }
 
-    private createFooter(serverQueryResult?: ServerQueryResult): string {
-        const lastUpdate: string = `Last update: ${new Date().toUTCString()}`;
-        const ping: string = serverQueryResult
-            ? `  |  Ping: ${serverQueryResult.ping} ms`
-            : '';
-
-        return lastUpdate + ping;
+    private createFooter(): string {
+        return `Last update: ${new Date().toUTCString()}`;
     }
 }

@@ -3,6 +3,7 @@ export interface ServerQueryResult {
     map: string;
     game: string;
     ping: number;
+    time?: string;
     currentPlayerCount: number;
     maxPlayerCount: number;
     playerList: {
