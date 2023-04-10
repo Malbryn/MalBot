@@ -9,7 +9,11 @@ import {
     SkipCommand,
     StopCommand,
 } from './music';
-import { CreateServerCommand } from './server_info';
+import {
+    CreateServerCommand,
+    StartServerMonitoringCommand,
+    StopServerMonitoringCommand,
+} from './server_info';
 
 export const commandMap: Map<string, Command> = new Map<string, Command>();
 
@@ -27,3 +31,11 @@ commandMap.set(PingCommand.data.name, PingCommand);
 
 // Server info
 commandMap.set(CreateServerCommand.data.name, CreateServerCommand);
+commandMap.set(
+    StartServerMonitoringCommand.data.name,
+    StartServerMonitoringCommand
+);
+commandMap.set(
+    StopServerMonitoringCommand.data.name,
+    StopServerMonitoringCommand
+);

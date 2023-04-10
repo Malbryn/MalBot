@@ -11,7 +11,7 @@ import { Collection, EmbedBuilder, Message, TextChannel } from 'discord.js';
 export class ServerMonitoringService {
     logger = new Logger(config.LOGGER_SETTINGS);
     gamedig: Gamedig = new Gamedig();
-    isRunning: boolean = false;
+    isStarted: boolean = false;
     intervalId: ReturnType<typeof setInterval> | undefined;
 
     private static instance: ServerMonitoringService;
@@ -39,7 +39,7 @@ export class ServerMonitoringService {
                     ServerMonitoringService.INTERVAL * 1000
                 );
 
-                this.isRunning = true;
+                this.isStarted = true;
             })
             .catch((reason: Error) => this.logger.error(reason));
     }
@@ -47,14 +47,18 @@ export class ServerMonitoringService {
     public stop(): void {
         this.logger.info('Stopping server monitor');
 
-        if (this.isRunning && this.intervalId) {
+        if (this.isStarted && this.intervalId) {
             clearInterval(this.intervalId);
 
             this.intervalId = undefined;
-            this.isRunning = false;
+            this.isStarted = false;
         } else {
             this.logger.warn('Server monitor is not running');
         }
+    }
+
+    public isRunning(): boolean {
+        return this.isStarted && this.intervalId !== undefined;
     }
 
     private handleInterval(serverInfo: ServerInfo): void {
