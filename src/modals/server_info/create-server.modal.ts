@@ -3,8 +3,8 @@ import { Client, Message, ModalSubmitInteraction } from 'discord.js';
 import { embedColours } from '../../config/config';
 import { Modal } from '../../interfaces/Modal';
 import { ServerInfo } from '../../interfaces/ServerInfo';
-import { DatabaseService } from '../../services/database.service';
 import { ServerMonitoringService } from '../../services/server-monitoring.service';
+import { databaseService } from '../../main';
 
 export const CreateServerModal: Modal = {
     data: { name: 'CreateServerInfoModal' },
@@ -35,18 +35,21 @@ export const CreateServerModal: Modal = {
         });
 
         if (message) {
+            const portNumber: number = Number.parseInt(
+                interaction.fields.getTextInputValue('serverPort')
+            );
+
             const serverInfo: ServerInfo = {
                 ip: interaction.fields.getTextInputValue('serverIP'),
-                port: interaction.fields.getTextInputValue('serverPort'),
+                port: portNumber,
                 game: interaction.fields.getTextInputValue('game'),
                 password: interaction.fields.getTextInputValue('password'),
                 modset: interaction.fields.getTextInputValue('modset'),
+                channelId: message.channel.id,
                 embedId: message.id,
             };
 
-            const databaseService: DatabaseService =
-                DatabaseService.getInstance();
-            await databaseService.serverInfoModel.create(serverInfo);
+            await databaseService.saveServerInfo(serverInfo);
 
             const serverMonitoringService: ServerMonitoringService =
                 ServerMonitoringService.getInstance();

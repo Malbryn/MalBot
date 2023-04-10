@@ -1,9 +1,10 @@
 export interface ServerInfo {
     id?: number;
     ip: string;
-    port: string;
+    port: number;
     game: string;
     password?: string;
     modset?: string;
-    embedId?: string;
+    channelId: string;
+    embedId: string;
 }

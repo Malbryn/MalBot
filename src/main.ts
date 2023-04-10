@@ -30,10 +30,19 @@ export const client: Client = new Client({
 handleClientReady();
 handleInteractionCreate();
 
-const databaseService: DatabaseService = DatabaseService.getInstance();
-const serverMonitoringService: ServerMonitoringService =
+// Init database and server monitor services
+export const databaseService: DatabaseService = DatabaseService.getInstance();
+export const serverMonitoringService: ServerMonitoringService =
     ServerMonitoringService.getInstance();
-serverMonitoringService.start();
+
+databaseService
+    .init()
+    .then(() => {
+        serverMonitoringService.start();
+    })
+    .catch((error: Error) => {
+        logger.error(error.message);
+    });
 
 // Initialise music player
 const ytdlOptions: Partial<downloadOptions> = {
