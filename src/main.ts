@@ -20,7 +20,9 @@ logger.info(`Guild ID: ${config.GUILD_ID}`);
 const client: Client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
     presence: {
-        activities: [{ name: 'Bottom Gear', type: ActivityType.Watching }],
+        activities: [
+            { name: config.ACTIVITY_NAME, type: ActivityType.Watching },
+        ],
     },
 });
 

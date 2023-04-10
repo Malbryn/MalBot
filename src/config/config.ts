@@ -6,6 +6,7 @@ export const config = {
     DISCORD_TOKEN: appConfig.client.discordToken,
     GUILD_ID: appConfig.client.guildID,
     CLIENT_ID: appConfig.client.clientID,
+    ACTIVITY_NAME: appConfig.client.activityName,
     LOGGER_SETTINGS: appConfig.loggerSettings,
     DATABASE_PATH: appConfig.database.path,
     SERVER_MONITORING_INTERVAL: appConfig.serverMonitoring.interval,

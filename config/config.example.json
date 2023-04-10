@@ -2,7 +2,8 @@
     "client": {
         "discordToken": "<DISCORD_TOKEN>",
         "clientID": "<CLIENT_ID>",
-        "guildID": "<GUILD_ID>"
+        "guildID": "<GUILD_ID>",
+        "activityName": ""
     },
     "loggerSettings": {
         "prettyLogTemplate": "{{dateIsoStr}} {{logLevelName}}\t"
