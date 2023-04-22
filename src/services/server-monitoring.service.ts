@@ -40,7 +40,7 @@ export class ServerMonitoringService {
 
                 this.isStarted = true;
             })
-            .catch((reason: Error) => this.logger.error(reason));
+            .catch((reason: Error) => this.logger.error(reason.message));
     }
 
     public stop(): void {
