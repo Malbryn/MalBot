@@ -246,14 +246,14 @@ export class ServerMonitoringService {
     private createPlayerListField(
         serverQueryResult: ServerQueryResult
     ): string {
-        const header: string = `\`\`\`\nName                 | Time\n--------------------------------\n`;
+        const header: string = `\`\`\`\nName                     | Time\n-----------------------------------\n`;
         const footer: string = '```';
         let content: string = '';
 
         for (const player of serverQueryResult.playerList) {
             if (!player.name) break;
 
-            const playerNamePadded: string = player.name.padEnd(20, ' ');
+            const playerNamePadded: string = player.name.padEnd(24, ' ');
             const playerRow: string = `${playerNamePadded} | ${player.time}\n`;
 
             content += playerRow;
