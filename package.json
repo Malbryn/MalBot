@@ -1,6 +1,6 @@
 {
     "name": "malbot",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "description": "A basic Discord bot written in TypeScript",
     "main": "index.js",
     "scripts": {
