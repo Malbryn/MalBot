@@ -10,7 +10,7 @@ import { ServerMonitoringService } from './services/server-monitoring.service';
 
 export {};
 
-const logger = new Logger(config.LOGGER_SETTINGS);
+export const logger = new Logger(config.LOGGER_SETTINGS);
 
 logger.info('Starting bot');
 logger.info(`Version ${process.env.npm_package_version}`);

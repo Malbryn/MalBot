@@ -10,11 +10,7 @@ import {
     SlashCommandBuilder,
     TextInputStyle,
 } from 'discord.js';
-import { Logger } from 'tslog';
-import { config } from '../../config/config';
 import { Command } from '../../interfaces/Command';
-
-const logger = new Logger(config.LOGGER_SETTINGS);
 
 export const CreateServerCommand: Command = {
     data: new SlashCommandBuilder()

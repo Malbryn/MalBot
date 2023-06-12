@@ -6,11 +6,9 @@ import {
     Message,
     SlashCommandBuilder,
 } from 'discord.js';
-import { Logger } from 'tslog';
-import { config, embedColours } from '../../config/config';
+import { embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
-
-const logger = new Logger(config.LOGGER_SETTINGS);
+import { logger } from '../../main';
 
 export const PingCommand: Command = {
     data: new SlashCommandBuilder()

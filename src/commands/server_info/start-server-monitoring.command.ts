@@ -1,6 +1,5 @@
-import { config, embedColours } from '../../config/config';
+import { embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
-import { Logger } from 'tslog';
 import {
     ChatInputCommandInteraction,
     Client,
@@ -9,8 +8,6 @@ import {
     SlashCommandBuilder,
 } from 'discord.js';
 import { serverMonitoringService } from '../../main';
-
-const logger = new Logger(config.LOGGER_SETTINGS);
 
 export const StartServerMonitoringCommand: Command = {
     data: new SlashCommandBuilder()

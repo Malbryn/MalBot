@@ -1,14 +1,12 @@
-import { Logger } from 'tslog';
 import { config, embedColours } from '../config/config';
 import Gamedig, { Type } from 'gamedig';
 import { ServerInfo } from '../interfaces/ServerInfo';
 import { Model } from 'sequelize';
 import { ServerQueryResult } from '../interfaces/ServerQueryResult';
-import { client, databaseService } from '../main';
+import { client, databaseService, logger } from '../main';
 import { Collection, EmbedBuilder, Message, TextChannel } from 'discord.js';
 
 export class ServerMonitoringService {
-    logger = new Logger(config.LOGGER_SETTINGS);
     gamedig: Gamedig = new Gamedig();
     isStarted: boolean = false;
     intervalId: ReturnType<typeof setInterval> | undefined;
@@ -27,7 +25,7 @@ export class ServerMonitoringService {
     }
 
     public start(): void {
-        this.logger.info('Starting server monitor');
+        logger.info('Starting server monitor');
 
         this.getServerInfoFromDatabase()
             .then((serverInfo: ServerInfo) => {
@@ -40,11 +38,11 @@ export class ServerMonitoringService {
 
                 this.isStarted = true;
             })
-            .catch((reason: Error) => this.logger.error(reason.message));
+            .catch((reason: Error) => logger.error(reason.message));
     }
 
     public stop(): void {
-        this.logger.info('Stopping server monitor');
+        logger.info('Stopping server monitor');
 
         if (this.isStarted && this.intervalId) {
             clearInterval(this.intervalId);
@@ -52,7 +50,7 @@ export class ServerMonitoringService {
             this.intervalId = undefined;
             this.isStarted = false;
         } else {
-            this.logger.warn('Server monitor is not running');
+            logger.warn('Server monitor is not running');
         }
     }
 
@@ -76,7 +74,7 @@ export class ServerMonitoringService {
             .catch(() => {
                 this.createOfflineEmbed(serverInfo);
 
-                this.logger.warn('Server is offline');
+                logger.warn('Server is offline');
             });
     }
 
@@ -85,7 +83,7 @@ export class ServerMonitoringService {
             await databaseService.getServerInfo();
 
         if (serverInfo) {
-            this.logger.debug(
+            logger.debug(
                 `Server info found [ID: ${serverInfo.dataValues.id}] [Game: ${serverInfo.dataValues.game}] [Address: ${serverInfo.dataValues.ip}:${serverInfo.dataValues.port}]`
             );
 
@@ -197,7 +195,7 @@ export class ServerMonitoringService {
         ) as TextChannel;
 
         if (!channel) {
-            this.logger.error('Channel is not found');
+            logger.error('Channel is not found');
             return undefined;
         }
 
@@ -210,7 +208,7 @@ export class ServerMonitoringService {
         );
 
         if (!message) {
-            this.logger.error('Message is not found');
+            logger.error('Message is not found');
             return undefined;
         }
 

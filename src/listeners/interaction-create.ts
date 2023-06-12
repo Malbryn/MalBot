@@ -8,12 +8,8 @@ import {
 import { Command } from '../interfaces/Command';
 import { Modal } from '../interfaces/Modal';
 import { modalMap } from '../modals/_ModalList';
-import { Logger } from 'tslog';
 import { commandMap } from '../commands/_CommandList';
-import { config } from '../config/config';
-import { client } from '../main';
-
-const logger = new Logger(config.LOGGER_SETTINGS);
+import { client, logger } from '../main';
 
 export default (): void => {
     client.on(

@@ -6,12 +6,9 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
 } from 'discord.js';
-import { Logger } from 'tslog';
 import { config, embedColours } from '../../config/config';
 import { Command } from '../../interfaces/Command';
-import { player } from '../../main';
-
-const logger = new Logger(config.LOGGER_SETTINGS);
+import { logger, player } from '../../main';
 
 export const StopCommand: Command = {
     data: new SlashCommandBuilder()

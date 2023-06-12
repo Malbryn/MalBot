@@ -4,13 +4,10 @@ import {
     RESTPostAPIChatInputApplicationCommandsJSONBody,
     Routes,
 } from 'discord.js';
-import { Logger } from 'tslog';
 import { commandMap } from '../commands/_CommandList';
 import { config } from '../config/config';
 import { Command } from '../interfaces/Command';
-import { client } from '../main';
-
-const logger = new Logger(config.LOGGER_SETTINGS);
+import { client, logger } from '../main';
 
 export default (): void => {
     client.once(Events.ClientReady, async (): Promise<void> => {

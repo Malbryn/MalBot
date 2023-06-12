@@ -1,11 +1,10 @@
 import path from 'path';
 import { DataTypes, Model, ModelStatic, Sequelize } from 'sequelize';
-import { Logger } from 'tslog';
 import { config } from '../config/config';
 import { ServerInfo } from 'src/interfaces/ServerInfo';
+import { logger } from '../main';
 
 export class DatabaseService {
-    logger = new Logger(config.LOGGER_SETTINGS);
     sequelize: Sequelize | undefined;
     serverInfoModel: ModelStatic<Model<ServerInfo>> | undefined;
 
@@ -28,7 +27,7 @@ export class DatabaseService {
 
     public async saveServerInfo(serverInfo: ServerInfo): Promise<void> {
         if (this.serverInfoModel) {
-            this.logger.info('Saving server info');
+            logger.info('Saving server info');
 
             await this.serverInfoModel.upsert(serverInfo);
         } else
@@ -39,7 +38,7 @@ export class DatabaseService {
 
     public async getServerInfo(): Promise<Model<ServerInfo> | null> {
         if (this.serverInfoModel) {
-            this.logger.info('Getting server info');
+            logger.info('Getting server info');
 
             return await this.serverInfoModel.findOne({
                 order: [['createdAt', 'DESC']],
@@ -51,12 +50,12 @@ export class DatabaseService {
     }
 
     private initDatabase(): Sequelize {
-        this.logger.info('Connecting to database');
+        logger.info('Connecting to database');
 
         return new Sequelize({
             dialect: 'sqlite',
             storage: path.resolve(__dirname, config.DATABASE_PATH),
-            logging: (message: string) => this.logger.debug(message),
+            logging: (message: string) => logger.debug(message),
         });
     }
 
@@ -98,9 +97,9 @@ export class DatabaseService {
         if (serverInfo) {
             await serverInfo.sync();
 
-            this.logger.info('Server info model synced');
+            logger.info('Server info model synced');
         } else {
-            this.logger.warn('Server info model is undefined');
+            logger.warn('Server info model is undefined');
         }
 
         return serverInfo;
