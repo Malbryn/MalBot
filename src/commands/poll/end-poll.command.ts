@@ -22,13 +22,13 @@ export const EndPollCommand: Command = {
         if (pollService.poll) {
             await pollService.stopPoll();
 
-            embedBuilder.setColor(embedColours.INFO).setAuthor({
+            embedBuilder.setColor(embedColours.BLUE).setAuthor({
                 name: 'Poll has been ended',
             } as EmbedAuthorOptions);
         } else {
             logger.warn('There is no poll in progress');
 
-            embedBuilder.setColor(embedColours.WARNING).setAuthor({
+            embedBuilder.setColor(embedColours.RED).setAuthor({
                 name: 'There is no poll in progress',
             } as EmbedAuthorOptions);
         }

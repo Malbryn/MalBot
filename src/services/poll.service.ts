@@ -113,7 +113,7 @@ export class PollService {
         embedBuilder
             .setTitle(this.poll.title)
             .setDescription('**Results:**')
-            .setColor(embedColours.INFO)
+            .setColor(embedColours.GREEN)
             .setFooter({
                 text: `Poll created by ${this.poll.createdBy}`,
                 iconURL: channel.guild.iconURL() ?? '',

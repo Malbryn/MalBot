@@ -36,11 +36,11 @@ export const SeekCommand: Command = {
                 logger.debug(`Seeking [Time: ${seekTime}s]`);
 
                 await queue.node.seek(seekTime);
-                embedBuilder.setColor(embedColours.INFO).setAuthor({
+                embedBuilder.setColor(embedColours.BLUE).setAuthor({
                     name: `⏩ Skipped to ${seekTime} seconds`,
                 } as EmbedAuthorOptions);
             } else {
-                embedBuilder.setColor(embedColours.WARNING).setAuthor({
+                embedBuilder.setColor(embedColours.RED).setAuthor({
                     name: '❌ There are no songs in the queue',
                 } as EmbedAuthorOptions);
             }

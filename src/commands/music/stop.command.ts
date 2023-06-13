@@ -27,11 +27,11 @@ export const StopCommand: Command = {
             logger.debug('Stopping player');
 
             queue.delete();
-            embedBuilder.setColor(embedColours.INFO).setAuthor({
+            embedBuilder.setColor(embedColours.BLUE).setAuthor({
                 name: '⏹ Player has been stopped',
             } as EmbedAuthorOptions);
         } else {
-            embedBuilder.setColor(embedColours.WARNING).setAuthor({
+            embedBuilder.setColor(embedColours.RED).setAuthor({
                 name: '❌ There are no songs in the queue',
             } as EmbedAuthorOptions);
         }

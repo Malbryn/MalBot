@@ -28,11 +28,11 @@ export const PauseCommand: Command = {
                 logger.debug('Pausing player');
 
                 queue.node.pause();
-                embedBuilder.setColor(embedColours.INFO).setAuthor({
+                embedBuilder.setColor(embedColours.BLUE).setAuthor({
                     name: '⏸ Player has been paused',
                 } as EmbedAuthorOptions);
             } else {
-                embedBuilder.setColor(embedColours.WARNING).setAuthor({
+                embedBuilder.setColor(embedColours.RED).setAuthor({
                     name: '❌ There are no songs in the queue',
                 } as EmbedAuthorOptions);
             }

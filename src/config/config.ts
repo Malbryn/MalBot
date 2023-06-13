@@ -18,13 +18,15 @@ export const config = {
 };
 
 export interface ColourPalette {
-    INFO: RGBTuple;
-    WARNING: RGBTuple;
-    ERROR: RGBTuple;
+    GREEN: RGBTuple;
+    BLUE: RGBTuple;
+    YELLOW: RGBTuple;
+    RED: RGBTuple;
 }
 
 export const embedColours: ColourPalette = {
-    INFO: [74, 144, 226],
-    WARNING: [248, 231, 28],
-    ERROR: [208, 2, 27],
+    GREEN: [87, 242, 135],
+    BLUE: [88, 101, 242],
+    YELLOW: [254, 231, 92],
+    RED: [237, 66, 69],
 };

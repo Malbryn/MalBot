@@ -19,7 +19,7 @@ export const PingCommand: Command = {
         interaction: ChatInputCommandInteraction
     ): Promise<void> {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
-        embedBuilder.setColor(embedColours.INFO).setAuthor({
+        embedBuilder.setColor(embedColours.BLUE).setAuthor({
             name: '⏱ Measuring latency...',
         } as EmbedAuthorOptions);
 

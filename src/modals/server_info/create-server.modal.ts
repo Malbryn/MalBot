@@ -18,7 +18,7 @@ export const CreateServerModal: Modal = {
 
         embedBuilder
             .setTitle('Server Info')
-            .setColor(embedColours.WARNING)
+            .setColor(embedColours.YELLOW)
             .setDescription('```Fetching data...```');
 
         await interaction.deleteReply();

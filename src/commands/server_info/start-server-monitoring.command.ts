@@ -20,13 +20,13 @@ export const StartServerMonitoringCommand: Command = {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
         if (serverMonitoringService.isRunning()) {
-            embedBuilder.setColor(embedColours.INFO).setAuthor({
+            embedBuilder.setColor(embedColours.YELLOW).setAuthor({
                 name: 'Server monitoring is already running',
             } as EmbedAuthorOptions);
         } else {
             serverMonitoringService.start();
 
-            embedBuilder.setColor(embedColours.INFO).setAuthor({
+            embedBuilder.setColor(embedColours.BLUE).setAuthor({
                 name: 'Server monitoring has been started',
             } as EmbedAuthorOptions);
         }

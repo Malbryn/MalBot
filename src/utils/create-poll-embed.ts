@@ -24,7 +24,7 @@ export function createPollEmbed(
     embedBuilder
         .setTitle(poll.title)
         .setDescription(`Duration: ${poll.duration} minutes`)
-        .setColor(embedColours.INFO)
+        .setColor(embedColours.BLUE)
         .setFooter({
             text: `Poll created by ${interaction.user.username}`,
             iconURL: interaction?.guild?.iconURL() ?? '',
