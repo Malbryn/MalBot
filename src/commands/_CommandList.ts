@@ -14,6 +14,11 @@ import {
     StartServerMonitoringCommand,
     StopServerMonitoringCommand,
 } from './server_info';
+import {
+    CreateMultiSelectPollCommand,
+    CreateSingleSelectPollCommand,
+    VoteCommand,
+} from './poll';
 
 export const commandMap: Map<string, Command> = new Map<string, Command>();
 
@@ -39,3 +44,14 @@ commandMap.set(
     StopServerMonitoringCommand.data.name,
     StopServerMonitoringCommand
 );
+
+// Poll
+commandMap.set(
+    CreateSingleSelectPollCommand.data.name,
+    CreateSingleSelectPollCommand
+);
+commandMap.set(
+    CreateMultiSelectPollCommand.data.name,
+    CreateMultiSelectPollCommand
+);
+commandMap.set(VoteCommand.data.name, VoteCommand);

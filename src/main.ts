@@ -7,6 +7,7 @@ import { config } from './config/config';
 import handleClientReady from './listeners/client-ready';
 import handleInteractionCreate from './listeners/interaction-create';
 import { ServerMonitoringService } from './services/server-monitoring.service';
+import { PollService } from './services/poll.service';
 
 export {};
 
@@ -30,10 +31,11 @@ export const client: Client = new Client({
 handleClientReady();
 handleInteractionCreate();
 
-// Init database and server monitor services
+// Init services
 export const databaseService: DatabaseService = DatabaseService.getInstance();
 export const serverMonitoringService: ServerMonitoringService =
     ServerMonitoringService.getInstance();
+export const pollService: PollService = PollService.getInstance();
 
 databaseService
     .init()
