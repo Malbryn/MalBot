@@ -45,10 +45,17 @@ export class PollService {
         }, this.getDurationInMs(poll));
     }
 
-    public stopPoll(): void {
+    public async stopPoll(): Promise<void> {
         if (this.intervalId) {
             clearTimeout(this.intervalId);
-            this.resetState();
+
+            try {
+                await this.getResult();
+            } catch (error: any) {
+                logger.error('Cannot get results: ', error.message);
+            } finally {
+                this.resetState();
+            }
         } else {
             logger.warn('No poll is in progress');
         }
@@ -104,8 +111,8 @@ export class PollService {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
         embedBuilder
-            .setTitle('Poll result')
-            .setDescription(this.poll.title)
+            .setTitle(this.poll.title)
+            .setDescription('**Results:**')
             .setColor(embedColours.INFO)
             .setFooter({
                 text: `Poll created by ${this.poll.createdBy}`,

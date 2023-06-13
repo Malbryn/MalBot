@@ -17,6 +17,7 @@ import {
 import {
     CreateMultiSelectPollCommand,
     CreateSingleSelectPollCommand,
+    EndPollCommand,
     VoteCommand,
 } from './poll';
 
@@ -54,4 +55,5 @@ commandMap.set(
     CreateMultiSelectPollCommand.data.name,
     CreateMultiSelectPollCommand
 );
+commandMap.set(EndPollCommand.data.name, EndPollCommand);
 commandMap.set(VoteCommand.data.name, VoteCommand);
