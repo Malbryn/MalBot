@@ -27,7 +27,7 @@ export function createPollEmbed(
         .setColor(embedColours.INFO)
         .setFooter({
             text: `Poll created by ${interaction.user.username}`,
-            iconURL: 'https://probot.media/tUE1WGMdwV.png',
+            iconURL: interaction?.guild?.iconURL() ?? '',
         })
         .addFields(fields);
 

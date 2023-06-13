@@ -109,7 +109,7 @@ export class PollService {
             .setColor(embedColours.INFO)
             .setFooter({
                 text: `Poll created by ${this.poll.createdBy}`,
-                iconURL: 'https://probot.media/tUE1WGMdwV.png',
+                iconURL: channel.guild.iconURL() ?? '',
             })
             .addFields(fields);
 

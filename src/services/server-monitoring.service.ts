@@ -138,7 +138,7 @@ export class ServerMonitoringService {
                 .setColor(embedColours.INFO)
                 .setFooter({
                     text: this.createFooter(),
-                    iconURL: 'https://probot.media/tUE1WGMdwV.png',
+                    iconURL: message.guild.iconURL() ?? '',
                 })
                 .addFields(
                     {
@@ -180,7 +180,7 @@ export class ServerMonitoringService {
                 .setColor(embedColours.ERROR)
                 .setFooter({
                     text: this.createFooter(),
-                    iconURL: 'https://probot.media/tUE1WGMdwV.png',
+                    iconURL: message.guild.iconURL() ?? '',
                 });
 
             await message.edit({ embeds: [embedBuilder] });
