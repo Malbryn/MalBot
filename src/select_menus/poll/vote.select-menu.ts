@@ -8,6 +8,9 @@ export const VoteSelectMenu: SelectMenu = {
         client: Client,
         interaction: StringSelectMenuInteraction
     ): Promise<void> {
+        if (interaction.user.id !== interaction.message.interaction?.user.id)
+            return;
+
         await interaction.reply('Casting vote...');
 
         try {
