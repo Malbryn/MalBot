@@ -20,4 +20,4 @@ COPY src ./src
 RUN npm install --omit=dev
 COPY --from=builder /app/dist/ dist/
 
-ENTRYPOINT ["npm", "run", "start:prod"]
+ENTRYPOINT ["/app/config/docker-entrypoint.sh"]
