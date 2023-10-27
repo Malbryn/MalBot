@@ -9,7 +9,13 @@
         "prettyLogTemplate": "{{dateIsoStr}} {{logLevelName}}\t"
     },
     "serverMonitoring": {
-        "interval": 300
+        "interval": 300,
+        "games":  [
+            {
+                "id": "",
+                "name": ""
+            }
+        ]
     },
     "database": {
         "path": "../../data/malbot.db"

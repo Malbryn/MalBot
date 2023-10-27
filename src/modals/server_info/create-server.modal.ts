@@ -3,7 +3,7 @@ import { Client, Message, ModalSubmitInteraction } from 'discord.js';
 import { embedColours } from '../../config/config';
 import { Modal } from '../../interfaces/Modal';
 import { ServerInfo } from '../../interfaces/ServerInfo';
-import { databaseService, serverMonitoringService } from '../../main';
+import { databaseService, logger, serverMonitoringService } from '../../main';
 
 export const CreateServerModal: Modal = {
     data: { name: 'CreateServerInfoModal' },
@@ -30,12 +30,16 @@ export const CreateServerModal: Modal = {
             const portNumber: number = Number.parseInt(
                 interaction.fields.getTextInputValue('serverPort')
             );
+            const gameId: string | undefined =
+                serverMonitoringService.pendingGame;
+
+            if (!gameId) logger.warn('Pending game is undefined');
 
             const serverInfo: ServerInfo = {
                 id: 1,
                 ip: interaction.fields.getTextInputValue('serverIP'),
                 port: portNumber,
-                game: interaction.fields.getTextInputValue('game'),
+                game: gameId ?? '',
                 password: interaction.fields.getTextInputValue('password'),
                 modset: interaction.fields.getTextInputValue('modset'),
                 channelId: message.channel.id,
@@ -43,6 +47,7 @@ export const CreateServerModal: Modal = {
             };
 
             await databaseService.saveServerInfo(serverInfo);
+            serverMonitoringService.resetPendingGame();
 
             if (serverMonitoringService.isRunning())
                 serverMonitoringService.stop();

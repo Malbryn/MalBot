@@ -10,6 +10,7 @@ export class ServerMonitoringService {
     gamedig: Gamedig = new Gamedig();
     isStarted: boolean = false;
     intervalId: ReturnType<typeof setInterval> | undefined;
+    pendingGame: string | undefined = '';
 
     private static instance: ServerMonitoringService;
     static readonly INTERVAL = config.SERVER_MONITORING_INTERVAL;
@@ -56,6 +57,10 @@ export class ServerMonitoringService {
 
     public isRunning(): boolean {
         return this.isStarted && this.intervalId !== undefined;
+    }
+
+    public resetPendingGame(): void {
+        this.pendingGame = undefined;
     }
 
     private handleInterval(serverInfo: ServerInfo): void {
