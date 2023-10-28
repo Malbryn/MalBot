@@ -28,7 +28,7 @@ export const QueueCommand: Command = {
             if (queue) {
                 const tracks: Track[] = queue.tracks.store;
 
-                logger.debug('Current queue lenght: ', tracks.length);
+                logger.debug('Current queue length: ', tracks.length);
 
                 const queueString: string =
                     tracks.length === 0
