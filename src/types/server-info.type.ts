@@ -1,4 +1,4 @@
-export interface ServerInfo {
+export type ServerInfo = {
     id?: number;
     ip: string;
     port: number;
@@ -7,4 +7,4 @@ export interface ServerInfo {
     modset?: string;
     channelId: string;
     embedId: string;
-}
+};

@@ -1,5 +1,5 @@
 import { embedColours } from '../../config/config';
-import { Command } from '../../interfaces/Command';
+import { Command } from '../../types/command.type';
 import {
     ChatInputCommandInteraction,
     Client,

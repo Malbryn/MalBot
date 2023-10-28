@@ -1,4 +1,4 @@
-import { Command } from '../interfaces/Command';
+import { Command } from '../types/command.type';
 import { PingCommand } from './misc';
 import {
     PauseCommand,

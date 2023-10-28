@@ -1,8 +1,8 @@
 import { config, embedColours } from '../config/config';
 import Gamedig, { Type } from 'gamedig';
-import { ServerInfo } from '../interfaces/ServerInfo';
+import { ServerInfo } from '../types/server-info.type';
 import { Model } from 'sequelize';
-import { ServerQueryResult } from '../interfaces/ServerQueryResult';
+import { ServerQueryResult } from '../types/server-query-result.type';
 import { client, databaseService, logger } from '../main';
 import { Collection, EmbedBuilder, Message, TextChannel } from 'discord.js';
 

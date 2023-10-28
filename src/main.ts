@@ -4,8 +4,8 @@ import { ActivityType, Client, GatewayIntentBits } from 'discord.js';
 import { Logger } from 'tslog';
 import { downloadOptions, Filter } from 'ytdl-core';
 import { config } from './config/config';
-import handleClientReady from './listeners/client-ready';
-import handleInteractionCreate from './listeners/interaction-create';
+import handleClientReady from './listeners/client-ready.listener';
+import handleInteractionCreate from './listeners/interaction-create.listener';
 import { ServerMonitoringService } from './services/server-monitoring.service';
 import { PollService } from './services/poll.service';
 
@@ -31,7 +31,7 @@ export const client: Client = new Client({
 handleClientReady();
 handleInteractionCreate();
 
-// Init services
+// Initialise services
 export const databaseService: DatabaseService = DatabaseService.getInstance();
 export const serverMonitoringService: ServerMonitoringService =
     ServerMonitoringService.getInstance();

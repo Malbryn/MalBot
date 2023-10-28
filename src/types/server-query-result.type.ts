@@ -1,4 +1,4 @@
-export interface ServerQueryResult {
+export type ServerQueryResult = {
     serverName: string;
     map: string;
     game: string;
@@ -10,4 +10,4 @@ export interface ServerQueryResult {
         name: string;
         time: string;
     }[];
-}
+};

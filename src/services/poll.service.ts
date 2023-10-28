@@ -1,9 +1,9 @@
 import { embedColours } from '../config/config';
-import { Poll } from '../interfaces/Poll';
+import { Poll } from '../types/poll.type';
 import { APIEmbedField, TextChannel } from 'discord.js';
 import { client, logger } from '../main';
 import { EmbedBuilder } from '@discordjs/builders';
-import { PollOption } from '../interfaces/PollOption';
+import { PollOption } from '../types/poll-option.type';
 
 export class PollService {
     poll: Poll | undefined;

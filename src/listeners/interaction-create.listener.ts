@@ -6,12 +6,12 @@ import {
     ModalSubmitInteraction,
     StringSelectMenuInteraction,
 } from 'discord.js';
-import { Command } from '../interfaces/Command';
-import { Modal } from '../interfaces/Modal';
+import { Command } from '../types/command.type';
+import { Modal } from '../types/modal.type';
 import { modalMap } from '../modals/_ModalList';
 import { commandMap } from '../commands/_CommandList';
 import { client, logger } from '../main';
-import { SelectMenu } from '../interfaces/SelectMenu';
+import { SelectMenu } from '../types/select-menu.type';
 import { selectMenuMap } from '../select_menus/_SelectMenuList';
 
 export default (): void => {
@@ -21,7 +21,7 @@ export default (): void => {
     );
 };
 
-export const onInteraction = async (
+const onInteraction = async (
     client: Client,
     interaction: Interaction
 ): Promise<void> => {

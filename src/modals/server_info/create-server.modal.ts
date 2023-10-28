@@ -1,8 +1,8 @@
 import { EmbedBuilder } from '@discordjs/builders';
 import { Client, Message, ModalSubmitInteraction } from 'discord.js';
 import { embedColours } from '../../config/config';
-import { Modal } from '../../interfaces/Modal';
-import { ServerInfo } from '../../interfaces/ServerInfo';
+import { Modal } from '../../types/modal.type';
+import { ServerInfo } from '../../types/server-info.type';
 import { databaseService, logger, serverMonitoringService } from '../../main';
 
 export const CreateServerModal: Modal = {

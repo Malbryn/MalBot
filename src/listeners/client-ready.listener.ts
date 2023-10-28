@@ -6,7 +6,7 @@ import {
 } from 'discord.js';
 import { commandMap } from '../commands/_CommandList';
 import { config } from '../config/config';
-import { Command } from '../interfaces/Command';
+import { Command } from '../types/command.type';
 import { client, logger } from '../main';
 
 export default (): void => {

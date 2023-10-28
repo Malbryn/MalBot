@@ -1,6 +1,6 @@
 import { ModalSubmitInteraction } from 'discord.js';
-import { PollOption } from '../interfaces/PollOption';
-import { Poll } from '../interfaces/Poll';
+import { PollOption } from '../types/poll-option.type';
+import { Poll } from '../types/poll.type';
 
 export function handlePollModal(
     interaction: ModalSubmitInteraction,

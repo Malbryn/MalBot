@@ -1,11 +1,11 @@
-import { Command } from '../../interfaces/Command';
+import { Command } from '../../types/command.type';
 import {
     ChatInputCommandInteraction,
     Client,
     SlashCommandBuilder,
 } from 'discord.js';
 import { ModalBuilder } from '@discordjs/builders';
-import { createNewPollModal } from '../../utils/create-poll-modal';
+import { createNewPollModal } from '../../utils/create-poll-modal.util';
 
 export const CreateMultiSelectPollCommand: Command = {
     data: new SlashCommandBuilder()

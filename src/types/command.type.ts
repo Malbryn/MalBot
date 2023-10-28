@@ -5,7 +5,7 @@ import {
     SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
 
-export interface Command {
+export type Command = {
     data:
         | Omit<SlashCommandBuilder, 'addSubcommandGroup' | 'addSubcommand'>
         | SlashCommandSubcommandsOnlyBuilder;
@@ -14,4 +14,4 @@ export interface Command {
         client: Client,
         interaction: ChatInputCommandInteraction
     ) => Promise<void>;
-}
+};

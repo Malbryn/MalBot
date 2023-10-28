@@ -1,8 +1,8 @@
 import { EmbedBuilder } from '@discordjs/builders';
-import { Poll } from '../interfaces/Poll';
+import { Poll } from '../types/poll.type';
 import { embedColours } from '../config/config';
 import { APIEmbedField, ModalSubmitInteraction } from 'discord.js';
-import { indexEmojiMap } from './index-emojis';
+import { indexEmojiMap } from './index-emojis.util';
 
 export function createPollEmbed(
     poll: Poll,

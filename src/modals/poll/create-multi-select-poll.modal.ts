@@ -1,10 +1,10 @@
-import { Modal } from '../../interfaces/Modal';
+import { Modal } from '../../types/modal.type';
 import { Client, ModalSubmitInteraction } from 'discord.js';
 import { EmbedBuilder } from '@discordjs/builders';
-import { Poll } from '../../interfaces/Poll';
+import { Poll } from '../../types/poll.type';
 import { pollService } from '../../main';
-import { handlePollModal } from '../../utils/handle-poll-modal';
-import { createPollEmbed } from '../../utils/create-poll-embed';
+import { handlePollModal } from '../../utils/handle-poll-modal.util';
+import { createPollEmbed } from '../../utils/create-poll-embed.util';
 
 export const CreateMultiSelectPollModal: Modal = {
     data: { name: 'CreateMultiSelectPollModal' },

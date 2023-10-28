@@ -1,4 +1,4 @@
-import { Command } from '../../interfaces/Command';
+import { Command } from '../../types/command.type';
 import {
     AnyComponentBuilder,
     ChatInputCommandInteraction,
@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { ActionRowBuilder } from '@discordjs/builders';
 import { logger, pollService } from '../../main';
-import { PollOption } from '../../interfaces/PollOption';
+import { PollOption } from '../../types/poll-option.type';
 
 export const VoteCommand: Command = {
     data: new SlashCommandBuilder()

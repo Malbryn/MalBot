@@ -1,4 +1,4 @@
-import { SelectMenu } from '../../interfaces/SelectMenu';
+import { SelectMenu } from '../../types/select-menu.type';
 import {
     Client,
     StringSelectMenuInteraction,

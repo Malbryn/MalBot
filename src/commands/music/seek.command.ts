@@ -10,7 +10,7 @@ import {
     SlashCommandBuilder,
 } from 'discord.js';
 import { config, embedColours } from '../../config/config';
-import { Command } from '../../interfaces/Command';
+import { Command } from '../../types/command.type';
 import { logger, player } from '../../main';
 
 export const SeekCommand: Command = {

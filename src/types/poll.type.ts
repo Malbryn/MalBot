@@ -1,6 +1,6 @@
-import { PollOption } from './PollOption';
+import { PollOption } from './poll-option.type';
 
-export interface Poll {
+export type Poll = {
     title: string;
     options: Map<number, PollOption>;
     duration: number;
@@ -8,4 +8,4 @@ export interface Poll {
     channelId: string | undefined;
     createdBy: string;
     voters: Set<string>;
-}
+};

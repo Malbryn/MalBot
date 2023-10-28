@@ -7,7 +7,7 @@ import {
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
 } from 'discord.js';
-import { Command } from '../../interfaces/Command';
+import { Command } from '../../types/command.type';
 import { config } from '../../config/config';
 
 export const CreateServerCommand: Command = {

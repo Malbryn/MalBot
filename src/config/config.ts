@@ -1,5 +1,5 @@
-import { RGBTuple } from 'discord.js';
 import { Config } from '../types/config.type';
+import { ColourPalette } from '../types/colour-palette.type';
 
 const appConfig = require('../../config/config.json');
 
@@ -18,13 +18,6 @@ export const config: Config = {
     MUSIC_HIGH_WATERMARK: appConfig.music.highWaterMark,
     MUSIC_DOWNLOAD_CHUNK_SIZE: appConfig.music.dlChunkSize,
 };
-
-export interface ColourPalette {
-    GREEN: RGBTuple;
-    BLUE: RGBTuple;
-    YELLOW: RGBTuple;
-    RED: RGBTuple;
-}
 
 export const embedColours: ColourPalette = {
     GREEN: [87, 242, 135],

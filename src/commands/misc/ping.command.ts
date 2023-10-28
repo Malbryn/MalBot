@@ -7,7 +7,7 @@ import {
     SlashCommandBuilder,
 } from 'discord.js';
 import { embedColours } from '../../config/config';
-import { Command } from '../../interfaces/Command';
+import { Command } from '../../types/command.type';
 import { logger } from '../../main';
 
 export const PingCommand: Command = {
@@ -23,7 +23,7 @@ export const PingCommand: Command = {
             name: '⏱ Measuring latency...',
         } as EmbedAuthorOptions);
 
-        const reply: Message<boolean> = await interaction.reply({
+        const reply: Message = await interaction.reply({
             embeds: [embedBuilder],
             fetchReply: true,
         });
