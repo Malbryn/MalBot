@@ -8,6 +8,8 @@ export const config: Config = {
     GUILD_ID: appConfig.client.guildID,
     CLIENT_ID: appConfig.client.clientID,
     ACTIVITY_NAME: appConfig.client.activityName,
+    LOGIN_RETRY_COUNT: appConfig.client.loginRetryCount,
+    LOGIN_RETRY_INTERVAL: appConfig.client.loginRetryIntervalMs,
     LOGGER_SETTINGS: appConfig.loggerSettings,
     SERVER_MONITORING_INTERVAL: appConfig.serverMonitoring.interval,
     SERVER_MONITORING_GAMES: appConfig.serverMonitoring.games,

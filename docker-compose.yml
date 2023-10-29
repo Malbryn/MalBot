@@ -5,4 +5,3 @@ services:
         container_name: malbot
         volumes:
             - /var/local/malbot/config:/app/config
-        restart: unless-stopped

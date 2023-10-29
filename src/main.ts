@@ -8,6 +8,7 @@ import handleClientReady from './listeners/client-ready.listener';
 import handleInteractionCreate from './listeners/interaction-create.listener';
 import { ServerMonitoringService } from './services/server-monitoring.service';
 import { PollService } from './services/poll.service';
+import { retry } from './utils/retry.util';
 
 export {};
 
@@ -60,4 +61,14 @@ export const player: Player = Player.singleton(client, { ytdlOptions });
 logger.debug('Initialised music player: ', player.options.ytdlOptions);
 
 // Log in with token
-client.login(config.DISCORD_TOKEN);
+retry(
+    () => client.login(config.DISCORD_TOKEN),
+    config.LOGIN_RETRY_COUNT,
+    config.LOGIN_RETRY_INTERVAL
+).catch((error) => {
+    logger.error(
+        `Failed to log in after (${config.LOGIN_RETRY_COUNT}) attempts: ${error.message}`
+    );
+
+    process.exit(1);
+});

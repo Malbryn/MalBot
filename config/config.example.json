@@ -3,7 +3,9 @@
         "discordToken": "<DISCORD_TOKEN>",
         "clientID": "<CLIENT_ID>",
         "guildID": "<GUILD_ID>",
-        "activityName": ""
+        "activityName": "",
+        "loginRetryCount": 5,
+        "loginRetryIntervalMs": 10000
     },
     "loggerSettings": {
         "prettyLogTemplate": "{{dateIsoStr}} {{logLevelName}}\t"

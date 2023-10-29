@@ -5,6 +5,8 @@ export type Config = {
     GUILD_ID: string;
     CLIENT_ID: string;
     ACTIVITY_NAME: string;
+    LOGIN_RETRY_COUNT: number;
+    LOGIN_RETRY_INTERVAL: number;
     LOGGER_SETTINGS: Partial<ISettingsParam<unknown>>;
     SERVER_MONITORING_INTERVAL: number;
     SERVER_MONITORING_GAMES: { name: string; id: string }[];
