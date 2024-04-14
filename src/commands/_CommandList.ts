@@ -14,12 +14,6 @@ import {
     StartServerMonitoringCommand,
     StopServerMonitoringCommand,
 } from './server_info';
-import {
-    CreateMultiSelectPollCommand,
-    CreateSingleSelectPollCommand,
-    EndPollCommand,
-    VoteCommand,
-} from './poll';
 
 export const commandMap: Map<string, Command> = new Map<string, Command>();
 
@@ -47,6 +41,8 @@ commandMap.set(
 );
 
 // Poll
+// Currently disabled because Discord added native poll support
+/*
 commandMap.set(
     CreateSingleSelectPollCommand.data.name,
     CreateSingleSelectPollCommand
@@ -57,3 +53,4 @@ commandMap.set(
 );
 commandMap.set(EndPollCommand.data.name, EndPollCommand);
 commandMap.set(VoteCommand.data.name, VoteCommand);
+*/
