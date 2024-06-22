@@ -1,13 +1,13 @@
 import { config, embedColours } from '../config/config';
-import Gamedig, { Type } from 'gamedig';
 import { ServerInfo } from '../types/server-info.type';
 import { Model } from 'sequelize';
 import { ServerQueryResult } from '../types/server-query-result.type';
 import { client, databaseService, logger } from '../main';
 import { Collection, EmbedBuilder, Message, TextChannel } from 'discord.js';
+import { GameDig, Player, QueryResult } from 'gamedig';
 
 export class ServerMonitoringService {
-    gamedig: Gamedig = new Gamedig();
+    gameDig: GameDig = new GameDig();
     isStarted: boolean = false;
     intervalId: ReturnType<typeof setInterval> | undefined;
     pendingGame: string | undefined = '';
@@ -34,7 +34,7 @@ export class ServerMonitoringService {
 
                 this.intervalId = setInterval(
                     () => this.handleInterval(serverInfo),
-                    ServerMonitoringService.INTERVAL * 1000
+                    ServerMonitoringService.INTERVAL * 1000,
                 );
 
                 this.isStarted = true;
@@ -64,13 +64,13 @@ export class ServerMonitoringService {
     }
 
     private handleInterval(serverInfo: ServerInfo): void {
-        this.gamedig
+        this.gameDig
             .query({
-                type: serverInfo.game as Type,
+                type: serverInfo.game,
                 host: serverInfo.ip,
                 port: serverInfo.port,
             })
-            .then((result: Gamedig.QueryResult) => {
+            .then((result: QueryResult) => {
                 const serverQueryResult: ServerQueryResult =
                     this.parseQueryResults(result);
 
@@ -89,16 +89,14 @@ export class ServerMonitoringService {
 
         if (serverInfo) {
             logger.debug(
-                `Server info found [ID: ${serverInfo.dataValues.id}] [Game: ${serverInfo.dataValues.game}] [Address: ${serverInfo.dataValues.ip}:${serverInfo.dataValues.port}]`
+                `Server info found [ID: ${serverInfo.dataValues.id}] [Game: ${serverInfo.dataValues.game}] [Address: ${serverInfo.dataValues.ip}:${serverInfo.dataValues.port}]`,
             );
 
             return serverInfo.dataValues;
         } else throw new Error('Server info is not found in database');
     }
 
-    private parseQueryResults(
-        queryResult: Gamedig.QueryResult
-    ): ServerQueryResult {
+    private parseQueryResults(queryResult: QueryResult): ServerQueryResult {
         type ObjectKey = keyof typeof queryResult.raw;
 
         return {
@@ -110,10 +108,10 @@ export class ServerMonitoringService {
             currentPlayerCount:
                 queryResult.raw!['numplayers' as ObjectKey] ?? -1,
             maxPlayerCount: queryResult.maxplayers,
-            playerList: queryResult.players.map((e: Gamedig.Player) => ({
+            playerList: queryResult.players.map((e: Player) => ({
                 name: e.name ?? '',
                 time: this.convertSecondsToTimestamp(
-                    e.raw!['time' as ObjectKey] ?? undefined
+                    e.raw!['time' as ObjectKey] ?? undefined,
                 ),
             })),
         };
@@ -129,11 +127,10 @@ export class ServerMonitoringService {
 
     private async refreshEmbed(
         serverInfo: ServerInfo,
-        serverQueryResult: ServerQueryResult
+        serverQueryResult: ServerQueryResult,
     ): Promise<void> {
-        const message: Message<true> | undefined = await this.getEmbedMessage(
-            serverInfo
-        );
+        const message: Message<true> | undefined =
+            await this.getEmbedMessage(serverInfo);
 
         if (message) {
             const embedBuilder: EmbedBuilder = new EmbedBuilder();
@@ -150,7 +147,7 @@ export class ServerMonitoringService {
                         name: 'Connection details',
                         value: this.createConnectionDetailsField(
                             serverInfo,
-                            serverQueryResult
+                            serverQueryResult,
                         ),
                     },
                     {
@@ -164,7 +161,7 @@ export class ServerMonitoringService {
                     {
                         name: 'Player list',
                         value: this.createPlayerListField(serverQueryResult),
-                    }
+                    },
                 );
 
             await message.edit({ embeds: [embedBuilder] });
@@ -172,9 +169,8 @@ export class ServerMonitoringService {
     }
 
     private async createOfflineEmbed(serverInfo: ServerInfo): Promise<void> {
-        const message: Message<true> | undefined = await this.getEmbedMessage(
-            serverInfo
-        );
+        const message: Message<true> | undefined =
+            await this.getEmbedMessage(serverInfo);
 
         if (message) {
             const embedBuilder: EmbedBuilder = new EmbedBuilder();
@@ -193,10 +189,10 @@ export class ServerMonitoringService {
     }
 
     private async getEmbedMessage(
-        serverInfo: ServerInfo
+        serverInfo: ServerInfo,
     ): Promise<Message<true> | undefined> {
         const channel: TextChannel | undefined = client.channels.cache.get(
-            serverInfo.channelId
+            serverInfo.channelId,
         ) as TextChannel;
 
         if (!channel) {
@@ -209,7 +205,7 @@ export class ServerMonitoringService {
             Message<true>
         > = await channel.messages.fetch();
         const message: Message<true> | undefined = messageCollection.get(
-            serverInfo.embedId
+            serverInfo.embedId,
         );
 
         if (!message) {
@@ -222,7 +218,7 @@ export class ServerMonitoringService {
 
     private createConnectionDetailsField(
         serverInfo: ServerInfo,
-        serverQueryResult: ServerQueryResult
+        serverQueryResult: ServerQueryResult,
     ): string {
         return `
         \`\`\`\nGame: ${serverQueryResult.game}\nServer name: ${serverQueryResult.serverName}\nAddress: ${serverInfo.ip}:${serverInfo.port}\nPassword: ${serverInfo.password}\`\`\`
@@ -247,7 +243,7 @@ export class ServerMonitoringService {
     }
 
     private createPlayerListField(
-        serverQueryResult: ServerQueryResult
+        serverQueryResult: ServerQueryResult,
     ): string {
         const header: string = `\`\`\`\nName                     | Time\n-----------------------------------\n`;
         const footer: string = '```';

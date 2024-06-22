@@ -4,11 +4,7 @@ import {
     SlashCommandIntegerOption,
 } from '@discordjs/builders';
 import { GuildQueue } from 'discord-player';
-import {
-    ChatInputCommandInteraction,
-    Client,
-    SlashCommandBuilder,
-} from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { config, embedColours } from '../../config/config';
 import { Command } from '../../types/command.type';
 import { logger, player } from '../../main';
@@ -18,12 +14,9 @@ export const SeekCommand: Command = {
         .setName('seek')
         .setDescription('Seeks to the given time.')
         .addIntegerOption((option: SlashCommandIntegerOption) =>
-            option.setName('time').setDescription('Time').setRequired(true)
+            option.setName('time').setDescription('Time').setRequired(true),
         ),
-    async run(
-        client: Client,
-        interaction: ChatInputCommandInteraction
-    ): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {

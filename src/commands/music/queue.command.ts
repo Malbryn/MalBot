@@ -2,7 +2,6 @@ import { GuildQueue, Track } from 'discord-player';
 import {
     APIEmbedField,
     ChatInputCommandInteraction,
-    Client,
     EmbedAuthorOptions,
     EmbedBuilder,
     SlashCommandBuilder,
@@ -15,10 +14,7 @@ export const QueueCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('queue')
         .setDescription('Shows the first 5 songs in the queue.'),
-    async run(
-        client: Client,
-        interaction: ChatInputCommandInteraction
-    ): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {

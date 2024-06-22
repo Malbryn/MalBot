@@ -2,7 +2,6 @@ import { ActionRowBuilder } from '@discordjs/builders';
 import {
     AnyComponentBuilder,
     ChatInputCommandInteraction,
-    Client,
     SlashCommandBuilder,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
@@ -14,10 +13,7 @@ export const CreateServerCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('create_server_info_panel')
         .setDescription('Creates the server info panel.'),
-    async run(
-        client: Client,
-        interaction: ChatInputCommandInteraction
-    ): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const selectMenu: StringSelectMenuBuilder =
             new StringSelectMenuBuilder()
                 .setCustomId('ServerMonitorSelectMenu')
@@ -31,7 +27,7 @@ export const CreateServerCommand: Command = {
             selectMenu.addOptions(
                 new StringSelectMenuOptionBuilder()
                     .setLabel(gameOption.name)
-                    .setValue(gameOption.id)
+                    .setValue(gameOption.id),
             );
         }
 

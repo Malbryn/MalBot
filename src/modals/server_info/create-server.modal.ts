@@ -1,5 +1,5 @@
 import { EmbedBuilder } from '@discordjs/builders';
-import { Client, Message, ModalSubmitInteraction } from 'discord.js';
+import { Message, ModalSubmitInteraction } from 'discord.js';
 import { embedColours } from '../../config/config';
 import { Modal } from '../../types/modal.type';
 import { ServerInfo } from '../../types/server-info.type';
@@ -7,10 +7,7 @@ import { databaseService, logger, serverMonitoringService } from '../../main';
 
 export const CreateServerModal: Modal = {
     data: { name: 'CreateServerInfoModal' },
-    async run(
-        client: Client,
-        interaction: ModalSubmitInteraction
-    ): Promise<void> {
+    async execute(interaction: ModalSubmitInteraction): Promise<void> {
         await interaction.reply('Creating new server info panel...');
 
         // Create new embed
@@ -28,7 +25,7 @@ export const CreateServerModal: Modal = {
 
         if (message) {
             const portNumber: number = Number.parseInt(
-                interaction.fields.getTextInputValue('serverPort')
+                interaction.fields.getTextInputValue('serverPort'),
             );
             const gameId: string | undefined =
                 serverMonitoringService.pendingGame;

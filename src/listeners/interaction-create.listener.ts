@@ -17,28 +17,25 @@ import { selectMenuMap } from '../select_menus/_SelectMenuList';
 export default (): void => {
     client.on(
         Events.InteractionCreate,
-        async (interaction) => await onInteraction(client, interaction)
+        async (interaction) => await onInteraction(client, interaction),
     );
 };
 
 const onInteraction = async (
     client: Client,
-    interaction: Interaction
+    interaction: Interaction,
 ): Promise<void> => {
     if (interaction.isCommand()) {
         const command: Command | undefined = commandMap.get(
-            interaction.commandName
+            interaction.commandName,
         );
 
         if (command) {
             logger.debug(
-                `Command used [Command: ${interaction.commandName}] [Requested by: ${interaction.member?.user.username}]`
+                `Command used [Command: ${interaction.commandName}] [Requested by: ${interaction.member?.user.username}]`,
             );
 
-            await command.run(
-                client as Client,
-                interaction as ChatInputCommandInteraction
-            );
+            await command.execute(interaction as ChatInputCommandInteraction);
         } else logger.error(`Command is not found: ${interaction.commandName}`);
     }
 
@@ -48,22 +45,19 @@ const onInteraction = async (
         if (modal) {
             logger.debug(`Handling modal: ${interaction.customId}`);
 
-            await modal.run(
-                client as Client,
-                interaction as ModalSubmitInteraction
-            );
+            await modal.execute(interaction as ModalSubmitInteraction);
         } else logger.error(`Modal is not found: ${interaction.customId}`);
     }
 
     if (interaction.isStringSelectMenu()) {
         const selectMenu: SelectMenu | undefined = selectMenuMap.get(
-            interaction.customId
+            interaction.customId,
         );
 
         if (selectMenu) {
             await selectMenu.run(
                 client as Client,
-                interaction as StringSelectMenuInteraction
+                interaction as StringSelectMenuInteraction,
             );
         } else
             logger.error(`Select menu is not found: ${interaction.customId}`);

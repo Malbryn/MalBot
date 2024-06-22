@@ -1,7 +1,6 @@
 import { GuildQueue } from 'discord-player';
 import {
     ChatInputCommandInteraction,
-    Client,
     EmbedAuthorOptions,
     EmbedBuilder,
     SlashCommandBuilder,
@@ -14,10 +13,7 @@ export const ResumeCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('resume')
         .setDescription('Resumes the current song.'),
-    async run(
-        client: Client,
-        interaction: ChatInputCommandInteraction
-    ): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const guildId: string | null = interaction.guildId;
 
         if (guildId) {

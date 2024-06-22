@@ -41,8 +41,8 @@ export const PlayCommand: Command = {
                     option
                         .setName('query')
                         .setDescription('Song URL or search keywords')
-                        .setRequired(true)
-                )
+                        .setRequired(true),
+                ),
         )
         .addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
             subcommand
@@ -52,14 +52,12 @@ export const PlayCommand: Command = {
                     option
                         .setName('url')
                         .setDescription('Playlist URL')
-                        .setRequired(true)
-                )
+                        .setRequired(true),
+                ),
         ),
-    async run(
-        client: Client,
-        interaction: ChatInputCommandInteraction
-    ): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
+        const client: Client = interaction.client;
 
         embedBuilder.setColor(embedColours.BLUE).setAuthor({
             name: '🔎 Searching...',
@@ -72,13 +70,13 @@ export const PlayCommand: Command = {
 
         const voiceChannel: VoiceBasedChannel | undefined = getVoiceChannel(
             client,
-            interaction
+            interaction,
         );
 
         if (voiceChannel) {
             const queue: GuildQueue | undefined = createQueue(
                 client,
-                interaction
+                interaction,
             );
 
             if (queue) {
@@ -90,7 +88,7 @@ export const PlayCommand: Command = {
                     await handleSubcommand(
                         interaction,
                         subcommand,
-                        embedBuilder
+                        embedBuilder,
                     );
 
                     await interaction.editReply({
@@ -101,7 +99,7 @@ export const PlayCommand: Command = {
                     const errorEmbedBuilder: EmbedBuilder = new EmbedBuilder();
 
                     logger.warn(
-                        `Failed to play song or playlist [Reason: ${message}]`
+                        `Failed to play song or playlist [Reason: ${message}]`,
                     );
 
                     errorEmbedBuilder.setColor(embedColours.RED).setAuthor({
@@ -127,7 +125,7 @@ export const PlayCommand: Command = {
 
 function getVoiceChannel(
     client: Client,
-    interaction: ChatInputCommandInteraction
+    interaction: ChatInputCommandInteraction,
 ): VoiceBasedChannel | undefined {
     const userId: string | undefined = interaction.member?.user.id;
 
@@ -142,7 +140,7 @@ function getVoiceChannel(
 
 function getGuild(
     client: Client,
-    interaction: ChatInputCommandInteraction
+    interaction: ChatInputCommandInteraction,
 ): Guild | undefined {
     const guildId: string | null = interaction.guildId;
 
@@ -151,7 +149,7 @@ function getGuild(
 
 function createQueue(
     client: Client,
-    interaction: ChatInputCommandInteraction
+    interaction: ChatInputCommandInteraction,
 ): GuildQueue | undefined {
     const guild: Guild | undefined = getGuild(client, interaction);
     const queueOptions: GuildNodeCreateOptions = {
@@ -173,7 +171,7 @@ function createQueue(
 
 async function connectToVoiceChannel(
     queue: GuildQueue,
-    voiceChannel: VoiceBasedChannel
+    voiceChannel: VoiceBasedChannel,
 ): Promise<void> {
     if (!queue.connection) await queue.connect(voiceChannel);
 }
@@ -181,7 +179,7 @@ async function connectToVoiceChannel(
 async function handleSubcommand(
     interaction: ChatInputCommandInteraction,
     subcommand: string,
-    embedBuilder: EmbedBuilder
+    embedBuilder: EmbedBuilder,
 ): Promise<void> {
     if (subcommand === SUBCOMMANDS.SONG) {
         await handleSongRequest(interaction, embedBuilder);
@@ -191,7 +189,7 @@ async function handleSubcommand(
 }
 async function handleSongRequest(
     interaction: ChatInputCommandInteraction,
-    embedBuilder: EmbedBuilder
+    embedBuilder: EmbedBuilder,
 ): Promise<void> {
     const query: string | null = interaction.options.getString('query');
 
@@ -226,7 +224,7 @@ async function handleSongRequest(
 
 async function handlePlaylistRequest(
     interaction: ChatInputCommandInteraction,
-    embedBuilder: EmbedBuilder
+    embedBuilder: EmbedBuilder,
 ) {
     const url: string | null = interaction.options.getString('url');
 
@@ -273,7 +271,7 @@ async function addSongToQueue(result: SearchResult): Promise<Track> {
         queue.addTrack(track);
 
         logger.debug(
-            `Track added to queue [Title: ${track.title}] [Duration: ${track.duration}]`
+            `Track added to queue [Title: ${track.title}] [Duration: ${track.duration}]`,
         );
     } else throw new Error('QueueCommand is not initialised!');
 

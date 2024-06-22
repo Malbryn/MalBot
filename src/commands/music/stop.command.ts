@@ -1,7 +1,6 @@
 import { GuildQueue } from 'discord-player';
 import {
     ChatInputCommandInteraction,
-    Client,
     EmbedAuthorOptions,
     EmbedBuilder,
     SlashCommandBuilder,
@@ -14,12 +13,9 @@ export const StopCommand: Command = {
     data: new SlashCommandBuilder()
         .setName('stop')
         .setDescription(
-            'Stops the player and kicks the bot from the voice channel.'
+            'Stops the player and kicks the bot from the voice channel.',
         ),
-    async run(
-        client: Client,
-        interaction: ChatInputCommandInteraction
-    ): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
         const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
 
