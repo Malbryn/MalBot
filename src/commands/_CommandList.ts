@@ -33,24 +33,9 @@ commandMap.set(PingCommand.data.name, PingCommand);
 commandMap.set(CreateServerCommand.data.name, CreateServerCommand);
 commandMap.set(
     StartServerMonitoringCommand.data.name,
-    StartServerMonitoringCommand
+    StartServerMonitoringCommand,
 );
 commandMap.set(
     StopServerMonitoringCommand.data.name,
-    StopServerMonitoringCommand
+    StopServerMonitoringCommand,
 );
-
-// Poll
-// Currently disabled because Discord added native poll support
-/*
-commandMap.set(
-    CreateSingleSelectPollCommand.data.name,
-    CreateSingleSelectPollCommand
-);
-commandMap.set(
-    CreateMultiSelectPollCommand.data.name,
-    CreateMultiSelectPollCommand
-);
-commandMap.set(EndPollCommand.data.name, EndPollCommand);
-commandMap.set(VoteCommand.data.name, VoteCommand);
-*/

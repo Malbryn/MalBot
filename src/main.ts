@@ -7,7 +7,6 @@ import { config } from './config/config';
 import handleClientReady from './listeners/client-ready.listener';
 import handleInteractionCreate from './listeners/interaction-create.listener';
 import { ServerMonitoringService } from './services/server-monitoring.service';
-import { PollService } from './services/poll.service';
 import { retry } from './utils/retry.util';
 
 export {};
@@ -36,7 +35,6 @@ handleInteractionCreate();
 export const databaseService: DatabaseService = DatabaseService.getInstance();
 export const serverMonitoringService: ServerMonitoringService =
     ServerMonitoringService.getInstance();
-export const pollService: PollService = PollService.getInstance();
 
 databaseService
     .init()
@@ -64,10 +62,10 @@ logger.debug('Initialised music player: ', player.options.ytdlOptions);
 retry(
     () => client.login(config.DISCORD_TOKEN),
     config.LOGIN_RETRY_COUNT,
-    config.LOGIN_RETRY_INTERVAL
+    config.LOGIN_RETRY_INTERVAL,
 ).catch((error) => {
     logger.error(
-        `Failed to log in after (${config.LOGIN_RETRY_COUNT}) attempts: ${error.message}`
+        `Failed to log in after (${config.LOGIN_RETRY_COUNT}) attempts: ${error.message}`,
     );
 
     process.exit(1);
