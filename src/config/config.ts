@@ -1,7 +1,6 @@
 import { Config } from '../types/config.type';
 import { ColourPalette } from '../types/colour-palette.type';
-
-const appConfig = require('../../config/config.json');
+import appConfig from '../../config/config.json';
 
 export const config: Config = {
     DISCORD_TOKEN: appConfig.client.discordToken,
@@ -22,8 +21,8 @@ export const config: Config = {
 };
 
 export const embedColours: ColourPalette = {
-    GREEN: [87, 242, 135],
-    BLUE: [88, 101, 242],
-    YELLOW: [254, 231, 92],
-    RED: [237, 66, 69],
+    DEBUG: [87, 242, 135],
+    INFO: [88, 101, 242],
+    WARNING: [254, 231, 92],
+    ERROR: [237, 66, 69],
 };

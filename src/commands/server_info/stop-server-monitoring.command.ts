@@ -18,11 +18,11 @@ export const StopServerMonitoringCommand: Command = {
         if (serverMonitoringService.isRunning()) {
             serverMonitoringService.stop();
 
-            embedBuilder.setColor(embedColours.BLUE).setAuthor({
+            embedBuilder.setColor(embedColours.INFO).setAuthor({
                 name: 'Server monitoring has been stopped',
             } as EmbedAuthorOptions);
         } else {
-            embedBuilder.setColor(embedColours.YELLOW).setAuthor({
+            embedBuilder.setColor(embedColours.WARNING).setAuthor({
                 name: 'Server monitoring is not running',
             } as EmbedAuthorOptions);
         }

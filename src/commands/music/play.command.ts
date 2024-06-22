@@ -59,7 +59,7 @@ export const PlayCommand: Command = {
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
         const client: Client = interaction.client;
 
-        embedBuilder.setColor(embedColours.BLUE).setAuthor({
+        embedBuilder.setColor(embedColours.INFO).setAuthor({
             name: '🔎 Searching...',
         } as EmbedAuthorOptions);
 
@@ -102,7 +102,7 @@ export const PlayCommand: Command = {
                         `Failed to play song or playlist [Reason: ${message}]`,
                     );
 
-                    errorEmbedBuilder.setColor(embedColours.RED).setAuthor({
+                    errorEmbedBuilder.setColor(embedColours.ERROR).setAuthor({
                         name: `❌ ${message}`,
                     } as EmbedAuthorOptions);
 
@@ -112,7 +112,7 @@ export const PlayCommand: Command = {
                 }
             }
         } else {
-            embedBuilder.setColor(embedColours.RED).setAuthor({
+            embedBuilder.setColor(embedColours.ERROR).setAuthor({
                 name: '❌ You must be in a voice channel to use this command!',
             } as EmbedAuthorOptions);
 
@@ -214,7 +214,7 @@ async function handleSongRequest(
     embedBuilder
         .setTitle(`**${song.title}**`)
         .setURL(song.url)
-        .setColor(embedColours.BLUE)
+        .setColor(embedColours.INFO)
         .setThumbnail(song.thumbnail)
         .setAuthor({
             name: '▶️ Added song to the queue',
@@ -253,7 +253,7 @@ async function handlePlaylistRequest(
         embedBuilder
             .setTitle(`**${playlist.title}**`)
             .setURL(playlist.url)
-            .setColor(embedColours.BLUE)
+            .setColor(embedColours.INFO)
             // @ts-ignore
             .setThumbnail(playlist.thumbnail.url)
             .setAuthor({

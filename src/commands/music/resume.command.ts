@@ -24,11 +24,11 @@ export const ResumeCommand: Command = {
                 logger.debug('Resuming player');
 
                 queue.node.resume();
-                embedBuilder.setColor(embedColours.BLUE).setAuthor({
+                embedBuilder.setColor(embedColours.INFO).setAuthor({
                     name: '▶️ Player has been resumed',
                 } as EmbedAuthorOptions);
             } else {
-                embedBuilder.setColor(embedColours.RED).setAuthor({
+                embedBuilder.setColor(embedColours.ERROR).setAuthor({
                     name: '❌ There are no songs in the queue',
                 } as EmbedAuthorOptions);
             }

@@ -62,19 +62,19 @@ export const QueueCommand: Command = {
                     embedBuilder
                         .setTitle(`**${currentTrackTitle}**`)
                         .setURL(currentTrackUrl)
-                        .setColor(embedColours.BLUE)
+                        .setColor(embedColours.INFO)
                         .setThumbnail(currentTrackThumbnail)
                         .setAuthor({
                             name: `▶️ Currently playing`,
                         } as EmbedAuthorOptions)
                         .addFields(fields);
                 } else {
-                    embedBuilder.setColor(embedColours.RED).setAuthor({
+                    embedBuilder.setColor(embedColours.ERROR).setAuthor({
                         name: '❌ There are no songs in the queue',
                     } as EmbedAuthorOptions);
                 }
             } else {
-                embedBuilder.setColor(embedColours.RED).setAuthor({
+                embedBuilder.setColor(embedColours.ERROR).setAuthor({
                     name: '❌ There are no songs in the queue',
                 } as EmbedAuthorOptions);
             }

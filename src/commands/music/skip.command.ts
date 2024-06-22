@@ -27,12 +27,12 @@ export const SkipCommand: Command = {
 
                 if (currentSong) {
                     queue.node.skip();
-                    embedBuilder.setColor(embedColours.BLUE).setAuthor({
+                    embedBuilder.setColor(embedColours.INFO).setAuthor({
                         name: `⏭ Skipped ${currentSong.title}`,
                     } as EmbedAuthorOptions);
                 }
             } else {
-                embedBuilder.setColor(embedColours.RED).setAuthor({
+                embedBuilder.setColor(embedColours.ERROR).setAuthor({
                     name: '❌ There are no songs in the queue',
                 } as EmbedAuthorOptions);
             }

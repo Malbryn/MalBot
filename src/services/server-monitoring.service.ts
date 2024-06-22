@@ -137,7 +137,7 @@ export class ServerMonitoringService {
 
             embedBuilder
                 .setTitle('Server Info')
-                .setColor(embedColours.BLUE)
+                .setColor(embedColours.INFO)
                 .setFooter({
                     text: this.createFooter(),
                     iconURL: message.guild.iconURL() ?? '',
@@ -178,7 +178,7 @@ export class ServerMonitoringService {
             embedBuilder
                 .setTitle('Server Info')
                 .setDescription('```SERVER IS OFFLINE```')
-                .setColor(embedColours.RED)
+                .setColor(embedColours.ERROR)
                 .setFooter({
                     text: this.createFooter(),
                     iconURL: message.guild.iconURL() ?? '',
