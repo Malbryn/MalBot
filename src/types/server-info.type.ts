@@ -1,10 +1,12 @@
 export type ServerInfo = {
     id?: number;
     ip: string;
-    port: number;
+    gamePort: number;
+    queryPort?: number;
     game: string;
     password?: string;
     modset?: string;
     channelId: string;
     embedId: string;
+    isRunning: boolean;
 };

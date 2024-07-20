@@ -1,23 +1,22 @@
 import { Config } from '../types/config.type';
 import { ColourPalette } from '../types/colour-palette.type';
-import appConfig from '../../config/config.json';
+
+const appConfig = require('../../config/config.json');
 
 export const config: Config = {
     DISCORD_TOKEN: appConfig.client.discordToken,
-    GUILD_ID: appConfig.client.guildID,
     CLIENT_ID: appConfig.client.clientID,
+    GUILD_ID: appConfig.client.guildID,
     ACTIVITY_NAME: appConfig.client.activityName,
     LOGIN_RETRY_COUNT: appConfig.client.loginRetryCount,
     LOGIN_RETRY_INTERVAL: appConfig.client.loginRetryIntervalMs,
     LOGGER_SETTINGS: appConfig.loggerSettings,
+    DATABASE_PATH: appConfig.database.path,
+    MUSIC_PLAYER_ACCESS_TOKEN: appConfig.MUSIC_PLAYER_ACCESS_TOKEN,
+    MUSIC_PLAYER_REFRESH_TOKEN: appConfig.MUSIC_PLAYER_REFRESH_TOKEN,
+    MUSIC_PLAYER_EXPIRY_DATE: appConfig.MUSIC_PLAYER_EXPIRY_DATE,
     SERVER_MONITORING_INTERVAL: appConfig.serverMonitoring.interval,
     SERVER_MONITORING_GAMES: appConfig.serverMonitoring.games,
-    DATABASE_PATH: appConfig.database.path,
-    MUSIC_QUALITY: appConfig.music.quality,
-    MUSIC_FILTER: appConfig.music.filter,
-    MUSIC_LIVE_BUFFER: appConfig.music.liveBuffer,
-    MUSIC_HIGH_WATERMARK: appConfig.music.highWaterMark,
-    MUSIC_DOWNLOAD_CHUNK_SIZE: appConfig.music.dlChunkSize,
 };
 
 export const embedColours: ColourPalette = {

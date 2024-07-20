@@ -5,3 +5,4 @@ services:
         container_name: malbot
         volumes:
             - /var/local/malbot/config:/app/config
+            - /var/local/malbot/data:/app/data

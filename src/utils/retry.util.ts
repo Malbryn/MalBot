@@ -1,7 +1,7 @@
 export const retry = async <T>(
     fn: () => Promise<T> | T,
     retries: number = 5,
-    retryIntervalMs: number = 10000
+    retryIntervalMs: number = 10000,
 ): Promise<T> => {
     try {
         return await fn();
@@ -11,6 +11,7 @@ export const retry = async <T>(
         }
 
         await sleep(retryIntervalMs);
+
         return retry(fn, retries - 1, retryIntervalMs);
     }
 };

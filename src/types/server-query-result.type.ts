@@ -1,10 +1,10 @@
 export type ServerQueryResult = {
-    serverName: string;
+    name: string;
     map: string;
     game: string;
     ping: number;
     time?: string;
-    currentPlayerCount: number;
+    playerCount: number;
     maxPlayerCount: number;
     playerList: {
         name: string;

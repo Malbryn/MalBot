@@ -2,20 +2,15 @@ import path from 'path';
 import { DataTypes, Model, ModelStatic, Sequelize } from 'sequelize';
 import { config } from '../config/config';
 import { ServerInfo } from 'src/types/server-info.type';
-import { logger } from '../main';
+import { logger } from '../index';
 
 export class DatabaseService {
-    sequelize: Sequelize | undefined;
-    serverInfoModel: ModelStatic<Model<ServerInfo>> | undefined;
-
     private static instance: DatabaseService;
 
-    private constructor() {}
+    private sequelize: Sequelize | undefined;
+    private serverInfoModel: ModelStatic<Model<ServerInfo>> | undefined;
 
-    public async init(): Promise<void> {
-        this.sequelize = this.initDatabase();
-        this.serverInfoModel = await this.createServerInfoTable();
-    }
+    private constructor() {}
 
     public static getInstance(): DatabaseService {
         if (!DatabaseService.instance) {
@@ -25,28 +20,58 @@ export class DatabaseService {
         return DatabaseService.instance;
     }
 
-    public async saveServerInfo(serverInfo: ServerInfo): Promise<void> {
-        if (this.serverInfoModel) {
-            logger.info('Saving server info');
+    public async init(): Promise<void> {
+        this.sequelize = this.initDatabase();
+        this.serverInfoModel = await this.createServerInfoTable();
+    }
 
-            await this.serverInfoModel.upsert(serverInfo);
-        } else
+    public async saveServerInfo(serverInfo: ServerInfo): Promise<void> {
+        if (!this.serverInfoModel) {
             throw new Error(
-                "Couldn't save server info because the model is undefined"
+                "Couldn't save server info because the model is undefined",
             );
+        }
+
+        logger.info('Saving server info');
+
+        await this.serverInfoModel.upsert(serverInfo);
     }
 
     public async getServerInfo(): Promise<Model<ServerInfo> | null> {
-        if (this.serverInfoModel) {
-            logger.info('Getting server info');
+        if (!this.serverInfoModel) {
+            throw new Error(
+                "Couldn't save server info because the model is undefined",
+            );
+        }
 
-            return await this.serverInfoModel.findOne({
+        logger.info('Getting server info');
+
+        return await this.serverInfoModel.findOne({
+            order: [['createdAt', 'DESC']],
+        });
+    }
+
+    public async updateRunningState(isRunning: boolean): Promise<void> {
+        if (!this.serverInfoModel) {
+            throw new Error(
+                "Couldn't save server info because the model is undefined",
+            );
+        }
+
+        logger.info(
+            `Updating server monitor running state [Value: ${isRunning}]`,
+        );
+
+        const serverInfo: Model<ServerInfo, ServerInfo> | null =
+            await this.serverInfoModel.findOne({
                 order: [['createdAt', 'DESC']],
             });
-        } else
-            throw new Error(
-                "Couldn't get server info because the model is undefined"
-            );
+
+        if (!serverInfo) {
+            throw new Error('Server info is not found in the database');
+        }
+
+        await serverInfo.update({ isRunning });
     }
 
     private initDatabase(): Sequelize {
@@ -62,15 +87,24 @@ export class DatabaseService {
     private async createServerInfoTable(): Promise<
         ModelStatic<Model<ServerInfo>> | undefined
     > {
+        if (!this.sequelize) {
+            logger.error('Sequelize database connection failed');
+            return;
+        }
+
         const serverInfo: ModelStatic<Model<ServerInfo>> | undefined =
-            this.sequelize?.define('server_info', {
+            this.sequelize.define('server_info', {
                 ip: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
-                port: {
+                gamePort: {
                     type: DataTypes.NUMBER,
                     allowNull: false,
+                },
+                queryPort: {
+                    type: DataTypes.NUMBER,
+                    allowNull: true,
                 },
                 game: {
                     type: DataTypes.STRING,
@@ -90,6 +124,10 @@ export class DatabaseService {
                 },
                 embedId: {
                     type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                isRunning: {
+                    type: DataTypes.BOOLEAN,
                     allowNull: false,
                 },
             });

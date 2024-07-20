@@ -2,18 +2,27 @@ import { config, embedColours } from '../config/config';
 import { ServerInfo } from '../types/server-info.type';
 import { Model } from 'sequelize';
 import { ServerQueryResult } from '../types/server-query-result.type';
-import { client, databaseService, logger } from '../main';
-import { Collection, EmbedBuilder, Message, TextChannel } from 'discord.js';
+import { logger } from '../index';
+import {
+    Channel,
+    ChannelType,
+    Collection,
+    EmbedBuilder,
+    Message,
+    Snowflake,
+} from 'discord.js';
 import { GameDig, Player, QueryResult } from 'gamedig';
+import { DatabaseService } from './database.service';
+import { App } from '../app';
 
 export class ServerMonitoringService {
-    gameDig: GameDig = new GameDig();
-    isStarted: boolean = false;
-    intervalId: ReturnType<typeof setInterval> | undefined;
-    pendingGame: string | undefined = '';
-
     private static instance: ServerMonitoringService;
-    static readonly INTERVAL = config.SERVER_MONITORING_INTERVAL;
+
+    private databaseService: DatabaseService = DatabaseService.getInstance();
+    private intervalId: ReturnType<typeof setInterval> | undefined;
+
+    isStarted: boolean = false;
+    pendingGame: string | undefined;
 
     private constructor() {}
 
@@ -25,34 +34,67 @@ export class ServerMonitoringService {
         return ServerMonitoringService.instance;
     }
 
-    public start(): void {
-        logger.info('Starting server monitor');
+    public async init(): Promise<void> {
+        logger.info('Initialising server monitor');
 
-        this.getServerInfoFromDatabase()
-            .then((serverInfo: ServerInfo) => {
-                this.handleInterval(serverInfo);
+        const serverInfo: ServerInfo | undefined =
+            await this.getServerInfoFromDatabase();
 
-                this.intervalId = setInterval(
-                    () => this.handleInterval(serverInfo),
-                    ServerMonitoringService.INTERVAL * 1000,
-                );
+        if (!serverInfo) {
+            logger.warn("Couldn't initialise server monitoring service");
 
-                this.isStarted = true;
-            })
-            .catch((reason: Error) => logger.error(reason.message));
+            return;
+        }
+
+        if (!serverInfo.isRunning) {
+            logger.info(
+                'Server monitoring running state was set to false, cancelling initialisation',
+            );
+
+            return;
+        }
+
+        await this.start();
     }
 
-    public stop(): void {
+    public async start(): Promise<void> {
+        logger.info('Starting server monitor');
+
+        const serverInfo: ServerInfo | undefined =
+            await this.getServerInfoFromDatabase();
+
+        if (!serverInfo) {
+            logger.warn("Couldn't start server monitoring service");
+
+            return;
+        }
+
+        await this.runQuery(serverInfo);
+
+        this.intervalId = setInterval(
+            async () => await this.runQuery(serverInfo),
+            config.SERVER_MONITORING_INTERVAL * 1000,
+        );
+        this.isStarted = true;
+
+        await this.databaseService.updateRunningState(true);
+    }
+
+    public async stop(): Promise<void> {
         logger.info('Stopping server monitor');
 
-        if (this.isStarted && this.intervalId) {
-            clearInterval(this.intervalId);
-
-            this.intervalId = undefined;
-            this.isStarted = false;
-        } else {
+        if (!this.isStarted && !this.intervalId) {
             logger.warn('Server monitor is not running');
+
+            return;
         }
+
+        clearInterval(this.intervalId);
+
+        this.intervalId = undefined;
+        this.isStarted = false;
+
+        await this.databaseService.updateRunningState(false);
     }
 
     public isRunning(): boolean {
@@ -63,84 +105,85 @@ export class ServerMonitoringService {
         this.pendingGame = undefined;
     }
 
-    private handleInterval(serverInfo: ServerInfo): void {
-        this.gameDig
-            .query({
+    private async runQuery(serverInfo: ServerInfo): Promise<void> {
+        try {
+            const queryResult: QueryResult = await GameDig.query({
                 type: serverInfo.game,
                 host: serverInfo.ip,
-                port: serverInfo.port,
-            })
-            .then((result: QueryResult) => {
-                const serverQueryResult: ServerQueryResult =
-                    this.parseQueryResults(result);
-
-                this.refreshEmbed(serverInfo, serverQueryResult);
-            })
-            .catch(() => {
-                this.createOfflineEmbed(serverInfo);
-
-                logger.warn('Server is offline');
+                port: serverInfo.queryPort ?? serverInfo.gamePort,
             });
+
+            const serverQueryResult: ServerQueryResult =
+                this.parseQueryResults(queryResult);
+            await this.refreshEmbed(serverInfo, serverQueryResult);
+        } catch (error) {
+            await this.createOfflineEmbed(serverInfo);
+        }
     }
 
-    private async getServerInfoFromDatabase(): Promise<ServerInfo> {
+    private async getServerInfoFromDatabase(): Promise<
+        Promise<ServerInfo> | undefined
+    > {
         const serverInfo: Model<ServerInfo, ServerInfo> | null =
-            await databaseService.getServerInfo();
+            await this.databaseService.getServerInfo();
 
-        if (serverInfo) {
-            logger.debug(
-                `Server info found [ID: ${serverInfo.dataValues.id}] [Game: ${serverInfo.dataValues.game}] [Address: ${serverInfo.dataValues.ip}:${serverInfo.dataValues.port}]`,
-            );
+        if (!serverInfo) {
+            logger.warn('Server info not found in database');
 
-            return serverInfo.dataValues;
-        } else throw new Error('Server info is not found in database');
+            return;
+        }
+
+        logger.debug(
+            `Server info found [ID: ${serverInfo.dataValues.id}] [Game: ${serverInfo.dataValues.game}] [Address: ${serverInfo.dataValues.ip}:${serverInfo.dataValues.gamePort}] [Is running: ${serverInfo.dataValues.isRunning}]`,
+        );
+
+        return serverInfo.dataValues;
     }
 
     private parseQueryResults(queryResult: QueryResult): ServerQueryResult {
         type ObjectKey = keyof typeof queryResult.raw;
 
         return {
-            serverName: queryResult.name,
+            name: queryResult.name,
             map: queryResult.map,
             game: queryResult.raw!['folder' as ObjectKey] ?? '',
             ping: queryResult.ping,
             time: queryResult.raw!['time' as ObjectKey] ?? '',
-            currentPlayerCount:
-                queryResult.raw!['numplayers' as ObjectKey] ?? -1,
+            playerCount: queryResult.numplayers ?? -1,
             maxPlayerCount: queryResult.maxplayers,
             playerList: queryResult.players.map((e: Player) => ({
                 name: e.name ?? '',
                 time: this.convertSecondsToTimestamp(
-                    e.raw!['time' as ObjectKey] ?? undefined,
+                    e.raw!['time' as ObjectKey] ?? -1,
                 ),
             })),
         };
     }
 
-    private convertSecondsToTimestamp(time: number | undefined): string {
-        if (time) {
-            return new Date(time * 1000).toISOString().substring(11, 19);
-        } else {
+    private convertSecondsToTimestamp(time: number): string {
+        if (time === -1) {
             return '--:--:--';
         }
+
+        return new Date(time * 1000).toISOString().substring(11, 19);
     }
 
     private async refreshEmbed(
         serverInfo: ServerInfo,
         serverQueryResult: ServerQueryResult,
     ): Promise<void> {
-        const message: Message<true> | undefined =
+        const message: Message | undefined =
             await this.getEmbedMessage(serverInfo);
 
         if (message) {
             const embedBuilder: EmbedBuilder = new EmbedBuilder();
 
             embedBuilder
-                .setTitle('Server Info')
+                .setTitle('SERVER INFO')
                 .setColor(embedColours.INFO)
                 .setFooter({
                     text: this.createFooter(),
-                    iconURL: message.guild.iconURL() ?? '',
+                    iconURL: message.guild?.iconURL() ?? '',
                 })
                 .addFields(
                     {
@@ -169,7 +212,7 @@ export class ServerMonitoringService {
     }
 
     private async createOfflineEmbed(serverInfo: ServerInfo): Promise<void> {
-        const message: Message<true> | undefined =
+        const message: Message | undefined =
             await this.getEmbedMessage(serverInfo);
 
         if (message) {
@@ -178,10 +221,10 @@ export class ServerMonitoringService {
             embedBuilder
                 .setTitle('Server Info')
                 .setDescription('```SERVER IS OFFLINE```')
-                .setColor(embedColours.ERROR)
+                .setColor(embedColours.WARNING)
                 .setFooter({
                     text: this.createFooter(),
-                    iconURL: message.guild.iconURL() ?? '',
+                    iconURL: message.guild?.iconURL() ?? '',
                 });
 
             await message.edit({ embeds: [embedBuilder] });
@@ -190,30 +233,32 @@ export class ServerMonitoringService {
 
     private async getEmbedMessage(
         serverInfo: ServerInfo,
-    ): Promise<Message<true> | undefined> {
-        const channel: TextChannel | undefined = client.channels.cache.get(
+    ): Promise<Message | undefined> {
+        const channel: Channel | null = await App.client.channels.fetch(
             serverInfo.channelId,
-        ) as TextChannel;
+        );
 
-        if (!channel) {
-            logger.error('Channel is not found');
-            return undefined;
+        if (!channel || channel.type !== ChannelType.GuildText) {
+            logger.error(
+                'Embed message channel is undefined or is not a text channel',
+            );
+
+            return;
         }
 
-        const messageCollection: Collection<
-            string,
-            Message<true>
-        > = await channel.messages.fetch();
-        const message: Message<true> | undefined = messageCollection.get(
+        const messages: Collection<Snowflake, Message> =
+            await channel.messages.fetch();
+        const embedMessage: Message | undefined = messages.get(
             serverInfo.embedId,
         );
 
-        if (!message) {
-            logger.error('Message is not found');
-            return undefined;
+        if (!embedMessage) {
+            logger.error('Embed message is not found');
+
+            return;
         }
 
-        return message;
+        return embedMessage;
     }
 
     private createConnectionDetailsField(
@@ -221,7 +266,7 @@ export class ServerMonitoringService {
         serverQueryResult: ServerQueryResult,
     ): string {
         return `
-        \`\`\`\nGame: ${serverQueryResult.game}\nServer name: ${serverQueryResult.serverName}\nAddress: ${serverInfo.ip}:${serverInfo.port}\nPassword: ${serverInfo.password}\`\`\`
+        \`\`\`\nGame: ${serverQueryResult.game}\nServer name: ${serverQueryResult.name}\nAddress: ${serverInfo.ip}:${serverInfo.gamePort}\nPassword: ${serverInfo.password}\`\`\`
         `;
     }
 
@@ -233,7 +278,7 @@ export class ServerMonitoringService {
 
     private createGameInfoField(serverQueryResult: ServerQueryResult): string {
         const basicInfo: string = `
-        \`\`\`\nPlayers: ${serverQueryResult.currentPlayerCount}/${serverQueryResult.maxPlayerCount}\nPing: ${serverQueryResult.ping} ms`;
+        \`\`\`\nMap: ${serverQueryResult.map}\nPlayers: ${serverQueryResult.playerCount}/${serverQueryResult.maxPlayerCount}\nPing: ${serverQueryResult.ping} ms`;
         const gameTime: string = serverQueryResult.time
             ? `\nTime: ${serverQueryResult.time}`
             : '';
