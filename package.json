@@ -23,6 +23,7 @@
         "@discord-player/extractor": "^4.1.0",
         "@discord-player/utils": "^0.2.0",
         "@discordjs/builders": "^1.4.0",
+        "@discordjs/opus": "^0.9.0",
         "@discordjs/rest": "^2.3.0",
         "@discordjs/voice": "^0.17.0",
         "@types/gamedig": "^5.0.2",
