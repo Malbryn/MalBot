@@ -1,7 +1,7 @@
 version: '3.9'
 services:
     malbot:
-        image: ghcr.io/malbryn/malbot:1.6.0
+        image: ghcr.io/malbryn/malbot:1.6.1
         container_name: malbot
         volumes:
             - /var/local/malbot/config:/app/config
