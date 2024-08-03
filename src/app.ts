@@ -25,11 +25,11 @@ import { MODAL_MAP } from './components/modals/modal-map';
 import { SelectMenu } from './components/select_menus/select-menu';
 import { SELECT_MENU_MAP } from './components/select_menus/select-menu-map';
 import { DatabaseService } from './services/database.service';
+import { YoutubeiExtractor } from 'discord-player-youtubei';
 import {
-    createYoutubeiStream,
-    YoutubeiExtractor,
-} from 'discord-player-youtubei';
-import { SpotifyExtractor } from '@discord-player/extractor';
+    SoundCloudExtractor,
+    SpotifyExtractor,
+} from '@discord-player/extractor';
 
 export class App {
     static client: Client = new Client({
@@ -85,17 +85,10 @@ export class App {
         const player: Player = new Player(App.client);
 
         await player.extractors.register(YoutubeiExtractor, {
-            authentication: {
-                access_token: config.MUSIC_PLAYER_ACCESS_TOKEN,
-                refresh_token: config.MUSIC_PLAYER_REFRESH_TOKEN,
-                scope: 'https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtube-paid-content',
-                token_type: 'Bearer',
-                expiry_date: config.MUSIC_PLAYER_EXPIRY_DATE,
-            },
+            authentication: '',
         });
-        await player.extractors.register(SpotifyExtractor, {
-            createStream: createYoutubeiStream,
-        });
+        await player.extractors.register(SpotifyExtractor, {});
+        await player.extractors.register(SoundCloudExtractor, {});
     }
 
     private async initServices(): Promise<void> {
