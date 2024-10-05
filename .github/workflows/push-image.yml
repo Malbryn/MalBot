@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: malbot
+  IMAGE_NAME: malbryn/malbot
 
 jobs:
   build-and-push-image:
