@@ -1,5 +1,10 @@
 import { EmbedBuilder } from '@discordjs/builders';
-import { Message, ModalSubmitInteraction } from 'discord.js';
+import {
+    GuildTextBasedChannel,
+    Message,
+    ModalSubmitInteraction,
+    TextBasedChannel,
+} from 'discord.js';
 import { Modal } from '../modal';
 import { DatabaseService } from '../../../services/database.service';
 import { ServerMonitoringService } from '../../../services/server-monitoring.service';
@@ -52,7 +57,9 @@ export class CreateServerMonitorModal extends Modal {
             return;
         }
 
-        const message: Message = await interaction.channel.send({
+        const channel: TextBasedChannel =
+            interaction.channel as GuildTextBasedChannel;
+        const message: Message = await channel.send({
             embeds: [embedBuilder],
         });
 

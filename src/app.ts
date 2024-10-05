@@ -76,16 +76,22 @@ export class App {
             .on(
                 Events.InteractionCreate,
                 async (interaction) => await this.onInteraction(interaction),
+            )
+            .on(Events.Error, (error) =>
+                logger.error(`Interaction failed: ${error.message}`),
             );
     }
 
     private async initMusicPlayer(): Promise<void> {
         logger.info('Initialising music player');
 
-        const player: Player = new Player(App.client);
+        const player: Player = new Player(App.client, {});
 
         await player.extractors.register(YoutubeiExtractor, {
             authentication: '',
+            streamOptions: {
+                useClient: 'YTMUSIC',
+            },
         });
         await player.extractors.register(SpotifyExtractor, {});
         await player.extractors.register(SoundCloudExtractor, {});
