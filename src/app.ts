@@ -89,9 +89,6 @@ export class App {
 
         await player.extractors.register(YoutubeiExtractor, {
             authentication: '',
-            streamOptions: {
-                useClient: 'YTMUSIC',
-            },
         });
         await player.extractors.register(SpotifyExtractor, {});
         await player.extractors.register(SoundCloudExtractor, {});
