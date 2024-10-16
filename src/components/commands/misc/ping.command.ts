@@ -41,9 +41,8 @@ export class PingCommand extends Command {
             name: '⏱️ Measuring latency...',
         });
 
-        const reply: Message = await interaction.reply({
+        const reply: Message = await interaction.editReply({
             embeds: [embedBuilder],
-            fetchReply: true,
         });
         const latency: number =
             reply.createdTimestamp - interaction.createdTimestamp;

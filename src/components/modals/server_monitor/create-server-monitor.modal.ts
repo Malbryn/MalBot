@@ -33,7 +33,10 @@ export class CreateServerMonitorModal extends Modal {
     }
 
     override async execute(interaction: ModalSubmitInteraction): Promise<void> {
-        await interaction.reply('Creating new server info panel...');
+        await this.sendSimpleReply(
+            interaction,
+            'Creating new server info panel...',
+        );
 
         const embedBuilder: EmbedBuilder = new EmbedBuilder();
 

@@ -30,7 +30,7 @@ export abstract class Command {
         return this.slashCommandBuilder?.toJSON();
     }
 
-    protected async sendReply(
+    protected async sendSimpleReply(
         interaction: CommandInteraction,
         message: string,
         colour: RGBTuple = embedColours.INFO,
@@ -41,9 +41,9 @@ export abstract class Command {
             name: message,
         });
 
-        const isReplied: boolean = interaction.replied;
+        const isHandled: boolean = interaction.replied || interaction.deferred;
 
-        isReplied
+        isHandled
             ? await interaction.editReply({
                   embeds: [embedBuilder],
               })
@@ -59,6 +59,10 @@ export abstract class Command {
     ): Promise<void> {
         const formattedMessage: string = `❌ ${message}`;
 
-        await this.sendReply(interaction, formattedMessage, embedColours.ERROR);
+        await this.sendSimpleReply(
+            interaction,
+            formattedMessage,
+            embedColours.ERROR,
+        );
     }
 }

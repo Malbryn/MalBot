@@ -41,6 +41,6 @@ export class StopCommand extends Command {
 
         queue.node.stop(true);
         queue.delete();
-        await this.sendReply(interaction, '⏹️ Stopped player');
+        await this.sendSimpleReply(interaction, '⏹️ Stopped player');
     }
 }

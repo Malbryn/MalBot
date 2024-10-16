@@ -71,7 +71,7 @@ export class PlayCommand extends Command {
                 );
             }
 
-            await this.sendReply(interaction, '🔎 Searching...');
+            await this.sendSimpleReply(interaction, '🔎 Searching...');
 
             const track: Track = await this.handleQuery(interaction);
             const queue: GuildQueue = await this.initGuildQueue(

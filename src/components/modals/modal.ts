@@ -5,7 +5,7 @@ import { embedColours } from '../../config/config';
 export abstract class Modal {
     public abstract execute(interaction: ModalSubmitInteraction): Promise<void>;
 
-    protected async sendReply(
+    protected async sendSimpleReply(
         interaction: ModalSubmitInteraction,
         message: string,
         colour: RGBTuple = embedColours.INFO,
@@ -16,9 +16,9 @@ export abstract class Modal {
             name: message,
         });
 
-        const isReplied: boolean = interaction.replied;
+        const isHandled: boolean = interaction.replied || interaction.deferred;
 
-        isReplied
+        isHandled
             ? await interaction.editReply({
                   embeds: [embedBuilder],
               })

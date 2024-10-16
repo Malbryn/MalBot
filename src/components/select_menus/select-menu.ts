@@ -11,7 +11,7 @@ export abstract class SelectMenu {
         interaction: AnySelectMenuInteraction,
     ): Promise<void>;
 
-    protected async sendReply(
+    protected async sendSimpleReply(
         interaction: StringSelectMenuInteraction,
         message: string,
         colour: RGBTuple = embedColours.INFO,
@@ -22,9 +22,9 @@ export abstract class SelectMenu {
             name: message,
         });
 
-        const isReplied: boolean = interaction.replied;
+        const isHandled: boolean = interaction.replied || interaction.deferred;
 
-        isReplied
+        isHandled
             ? await interaction.editReply({
                   embeds: [embedBuilder],
               })

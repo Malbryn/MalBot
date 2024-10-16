@@ -45,7 +45,7 @@ export class SkipCommand extends Command {
         );
 
         queue.node.skip();
-        await this.sendReply(
+        await this.sendSimpleReply(
             interaction,
             `⏭️ Skipped ${currentSong?.title ?? ''}`,
         );

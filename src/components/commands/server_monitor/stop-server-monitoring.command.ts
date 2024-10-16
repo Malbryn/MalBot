@@ -35,7 +35,7 @@ export class StopServerMonitoringCommand extends Command {
         interaction: ChatInputCommandInteraction,
     ): Promise<void> {
         if (!this.serverMonitoringService.isRunning()) {
-            return await this.sendReply(
+            return await this.sendSimpleReply(
                 interaction,
                 '⚠️ Server monitoring is not running',
                 embedColours.WARNING,
@@ -43,7 +43,7 @@ export class StopServerMonitoringCommand extends Command {
         }
 
         await this.serverMonitoringService.stop();
-        await this.sendReply(
+        await this.sendSimpleReply(
             interaction,
             '📡 Server monitoring has been stopped',
         );

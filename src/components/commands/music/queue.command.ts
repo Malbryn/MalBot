@@ -75,7 +75,7 @@ export class QueueCommand extends Command {
             });
         }
 
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [embedBuilder],
         });
     }

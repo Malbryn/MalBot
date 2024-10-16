@@ -168,6 +168,7 @@ export class App {
             `Handling command [Command: ${interaction.commandName}] [Requested by: ${interaction.member?.user.username}]`,
         );
 
+        await interaction.deferReply();
         await command.execute(interaction);
     }
 
@@ -185,6 +186,7 @@ export class App {
             `Handling modal [Modal: ${interaction.customId}] [Requested by: ${interaction.member?.user.username}]`,
         );
 
+        await interaction.deferReply();
         await modal.execute(interaction);
     }
 
@@ -208,6 +210,8 @@ export class App {
             `Handling select menu [Select menu: ${interaction.customId}] [Requested by: ${interaction.member?.user.username}]`,
         );
 
+        // Cannot show modal after deferReply()
+        // await interaction.deferReply();
         await selectMenu.execute(interaction);
     }
 }

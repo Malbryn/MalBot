@@ -1,4 +1,8 @@
-import { StringSelectMenuInteraction, TextInputStyle } from 'discord.js';
+import {
+    MessageInteractionMetadata,
+    StringSelectMenuInteraction,
+    TextInputStyle,
+} from 'discord.js';
 import {
     ActionRowBuilder,
     ModalActionRowComponentBuilder,
@@ -32,9 +36,18 @@ export class CreateServerMonitorSelectMenu extends SelectMenu {
     override async execute(
         interaction: StringSelectMenuInteraction,
     ): Promise<void> {
-        if (interaction.user.id !== interaction.message.interaction?.user.id) {
+        const metadata: MessageInteractionMetadata | null =
+            interaction.message.interactionMetadata;
+
+        if (!metadata) {
+            logger.warn('Message interaction metadata is not found');
+
+            return;
+        }
+
+        if (interaction.user.id !== metadata.user.id) {
             logger.warn(
-                `Select menu user mismatch [Interaction owner: ${interaction.message.interaction?.user.username}] [Interacting user: ${interaction.user.username}]`,
+                `Select menu user mismatch [Interaction owner: ${metadata.user.username}] [Interacting user: ${interaction.user.username}]`,
             );
 
             return;

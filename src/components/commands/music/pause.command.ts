@@ -41,6 +41,6 @@ export class PauseCommand extends Command {
         logger.debug('Pausing player');
 
         queue.node.pause();
-        await this.sendReply(interaction, '⏸️ Paused player');
+        await this.sendSimpleReply(interaction, '⏸️ Paused player');
     }
 }

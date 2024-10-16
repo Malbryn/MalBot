@@ -55,7 +55,7 @@ export class SeekCommand extends Command {
 
         try {
             await queue.node.seek(seekTime * 1000);
-            await this.sendReply(
+            await this.sendSimpleReply(
                 interaction,
                 `⏩ Skipped to ${seekTime} seconds`,
             );

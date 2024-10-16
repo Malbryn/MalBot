@@ -41,6 +41,6 @@ export class ResumeCommand extends Command {
         logger.debug('Resuming player');
 
         queue.node.resume();
-        await this.sendReply(interaction, '▶️ Resumed player');
+        await this.sendSimpleReply(interaction, '▶️ Resumed player');
     }
 }

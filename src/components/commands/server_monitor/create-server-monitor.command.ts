@@ -58,7 +58,7 @@ export class CreateServerMonitorCommand extends Command {
         const actionRow: ActionRowBuilder<AnyComponentBuilder> =
             new ActionRowBuilder().addComponents(selectMenu);
 
-        await interaction.reply({
+        await interaction.editReply({
             content: 'Select a game',
             // @ts-ignore
             components: [actionRow],
