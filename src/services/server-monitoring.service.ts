@@ -1,8 +1,3 @@
-import { config, embedColours } from '../config/config';
-import { ServerInfo } from '../types/server-info.type';
-import { Model } from 'sequelize';
-import { ServerQueryResult } from '../types/server-query-result.type';
-import { logger } from '../index';
 import {
     Channel,
     ChannelType,
@@ -12,26 +7,32 @@ import {
     Snowflake,
 } from 'discord.js';
 import { GameDig, Player, QueryResult } from 'gamedig';
-import { DatabaseService } from './database.service';
+import { Model } from 'sequelize';
 import { App } from '../app';
+import { embedColours, logger } from '../globals';
+import { ServerInfo, ServerQueryResult } from '../types';
+import { ConfigService } from './config.service';
+import { DatabaseService } from './database.service';
 
 export class ServerMonitoringService {
-    private static instance: ServerMonitoringService;
+    private static _instance: ServerMonitoringService;
 
-    private databaseService: DatabaseService = DatabaseService.getInstance();
-    private intervalId: ReturnType<typeof setInterval> | undefined;
+    private _configService: ConfigService = ConfigService.getInstance();
+    private _databaseService: DatabaseService = DatabaseService.getInstance();
 
-    isStarted: boolean = false;
+    private _intervalId: ReturnType<typeof setInterval> | undefined;
+    private _isStarted: boolean = false;
+
     pendingGame: string | undefined;
 
     private constructor() {}
 
     public static getInstance(): ServerMonitoringService {
-        if (!ServerMonitoringService.instance) {
-            ServerMonitoringService.instance = new ServerMonitoringService();
+        if (!ServerMonitoringService._instance) {
+            ServerMonitoringService._instance = new ServerMonitoringService();
         }
 
-        return ServerMonitoringService.instance;
+        return ServerMonitoringService._instance;
     }
 
     public async init(): Promise<void> {
@@ -42,7 +43,6 @@ export class ServerMonitoringService {
 
         if (!serverInfo) {
             logger.warn("Couldn't initialise server monitoring service");
-
             return;
         }
 
@@ -50,7 +50,6 @@ export class ServerMonitoringService {
             logger.info(
                 'Server monitoring running state was set to false, cancelling initialisation',
             );
-
             return;
         }
 
@@ -65,40 +64,40 @@ export class ServerMonitoringService {
 
         if (!serverInfo) {
             logger.warn("Couldn't start server monitoring service");
-
             return;
         }
 
         await this.runQuery(serverInfo);
 
-        this.intervalId = setInterval(
+        const interval =
+            this._configService.get('serverMonitor').interval * 1000;
+        this._intervalId = setInterval(
             async () => await this.runQuery(serverInfo),
-            config.SERVER_MONITORING_INTERVAL * 1000,
+            interval,
         );
-        this.isStarted = true;
+        this._isStarted = true;
 
-        await this.databaseService.updateRunningState(true);
+        await this._databaseService.updateRunningState(true);
     }
 
     public async stop(): Promise<void> {
         logger.info('Stopping server monitor');
 
-        if (!this.isStarted && !this.intervalId) {
+        if (!this._isStarted && !this._intervalId) {
             logger.warn('Server monitor is not running');
-
             return;
         }
 
-        clearInterval(this.intervalId);
+        clearInterval(this._intervalId);
 
-        this.intervalId = undefined;
-        this.isStarted = false;
+        this._intervalId = undefined;
+        this._isStarted = false;
 
-        await this.databaseService.updateRunningState(false);
+        await this._databaseService.updateRunningState(false);
     }
 
     public isRunning(): boolean {
-        return this.isStarted && this.intervalId !== undefined;
+        return this._isStarted && this._intervalId !== undefined;
     }
 
     public resetPendingGame(): void {
@@ -112,9 +111,9 @@ export class ServerMonitoringService {
                 host: serverInfo.ip,
                 port: serverInfo.queryPort ?? serverInfo.gamePort,
             });
-
             const serverQueryResult: ServerQueryResult =
                 this.parseQueryResults(queryResult);
+
             await this.refreshEmbed(serverInfo, serverQueryResult);
         } catch (error) {
             await this.createOfflineEmbed(serverInfo);
@@ -125,11 +124,10 @@ export class ServerMonitoringService {
         Promise<ServerInfo> | undefined
     > {
         const serverInfo: Model<ServerInfo, ServerInfo> | null =
-            await this.databaseService.getServerInfo();
+            await this._databaseService.getServerInfo();
 
         if (!serverInfo) {
             logger.warn('Server info not found in database');
-
             return;
         }
 
@@ -160,7 +158,7 @@ export class ServerMonitoringService {
         };
     }
 
-    private convertSecondsToTimestamp(time: number): string {
+    private convertSecondsToTimestamp(time: number = -1): string {
         if (time === -1) {
             return '--:--:--';
         }
@@ -242,7 +240,6 @@ export class ServerMonitoringService {
             logger.error(
                 'Embed message channel is undefined or is not a text channel',
             );
-
             return;
         }
 
@@ -254,7 +251,6 @@ export class ServerMonitoringService {
 
         if (!embedMessage) {
             logger.error('Embed message is not found');
-
             return;
         }
 

@@ -1,4 +1,10 @@
 import {
+    SoundCloudExtractor,
+    SpotifyExtractor,
+} from '@discord-player/extractor';
+import { Player } from 'discord-player';
+import { YoutubeiExtractor } from 'discord-player-youtubei';
+import {
     ActivityType,
     AnySelectMenuInteraction,
     ButtonInteraction,
@@ -13,59 +19,74 @@ import {
     RESTPostAPIChatInputApplicationCommandsJSONBody,
     Routes,
 } from 'discord.js';
-import { config } from './config/config';
-import { logger } from './index';
-import { ServerMonitoringService } from './services/server-monitoring.service';
-import { Player } from 'discord-player';
-import { retry } from './utils/retry.util';
+import * as process from 'node:process';
 import { Command } from './components/commands/command';
 import { COMMAND_MAP } from './components/commands/command-map';
 import { Modal } from './components/modals/modal';
 import { MODAL_MAP } from './components/modals/modal-map';
 import { SelectMenu } from './components/select_menus/select-menu';
 import { SELECT_MENU_MAP } from './components/select_menus/select-menu-map';
-import { DatabaseService } from './services/database.service';
-import { YoutubeiExtractor } from 'discord-player-youtubei';
+import { environment, logger, version } from './globals';
 import {
-    SoundCloudExtractor,
-    SpotifyExtractor,
-} from '@discord-player/extractor';
+    ConfigService,
+    DatabaseService,
+    ServerMonitoringService,
+} from './services';
+import { retry } from './utils';
 
 export class App {
-    static client: Client = new Client({
-        intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
-        presence: {
-            activities: [
-                { name: config.ACTIVITY_NAME, type: ActivityType.Watching },
-            ],
-        },
-    });
+    static client: Client;
+
+    private _configService: ConfigService = ConfigService.getInstance();
 
     constructor() {
         logger.info(
-            `Creating app [Version: ${process.env.npm_package_version}] [Guild ID: ${config.GUILD_ID}]`,
+            `Creating app [Env: ${environment}] [Version: ${version}] [Guild ID: ${this._configService.get('client').guildId}]`,
         );
     }
 
     async start(): Promise<void> {
         logger.info('Starting bot');
 
+        this.initClient();
         this.initEventListeners();
         await this.initMusicPlayer();
 
         await retry(
-            async () => await App.client.login(config.DISCORD_TOKEN),
-            config.LOGIN_RETRY_COUNT,
-            config.LOGIN_RETRY_INTERVAL,
+            async () =>
+                await App.client.login(
+                    this._configService.get('client').discordToken,
+                ),
+            this._configService.get('client').loginRetry.count,
+            this._configService.get('client').loginRetry.intervalMs,
         )
             .then(() => logger.info('Login successful'))
             .catch((error) => {
                 logger.error(
-                    `Failed to log in after (${config.LOGIN_RETRY_COUNT}) attempts: ${error.message}`,
+                    `Failed to log in after (${this._configService.get('client').loginRetry.count}) attempts: ${error.message}`,
                 );
 
-                process.exit(1);
+                this.shutdown();
             });
+    }
+
+    private initClient(): void {
+        logger.info('Initialising client');
+
+        App.client = new Client({
+            intents: [
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildVoiceStates,
+            ],
+            presence: {
+                activities: [
+                    {
+                        name: this._configService.get('client').activityName,
+                        type: ActivityType.Watching,
+                    },
+                ],
+            },
+        });
     }
 
     private initEventListeners(): void {
@@ -109,7 +130,7 @@ export class App {
         logger.info('Registering commands');
 
         const rest: REST = new REST({ version: '10' }).setToken(
-            config.DISCORD_TOKEN,
+            this._configService.get('client').discordToken,
         );
         const commands: Command[] = Array.from(COMMAND_MAP.values());
         const commandJsonBodies: RESTPostAPIChatInputApplicationCommandsJSONBody[] =
@@ -118,7 +139,10 @@ export class App {
                 .filter((commandJson) => commandJson !== undefined);
 
         await rest.put(
-            Routes.applicationGuildCommands(config.CLIENT_ID, config.GUILD_ID),
+            Routes.applicationGuildCommands(
+                this._configService.get('client').clientId,
+                this._configService.get('client').guildId,
+            ),
             { body: commandJsonBodies },
         );
     }
@@ -210,8 +234,12 @@ export class App {
             `Handling select menu [Select menu: ${interaction.customId}] [Requested by: ${interaction.member?.user.username}]`,
         );
 
-        // Cannot show modal after deferReply()
-        // await interaction.deferReply();
         await selectMenu.execute(interaction);
+    }
+
+    private shutdown(code: number = 1): void {
+        logger.warn(`Shutting down app [Code: ${code}]`);
+
+        process.exit(code);
     }
 }

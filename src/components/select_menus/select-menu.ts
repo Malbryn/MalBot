@@ -1,10 +1,10 @@
+import { EmbedBuilder } from '@discordjs/builders';
 import {
     AnySelectMenuInteraction,
     RGBTuple,
     StringSelectMenuInteraction,
 } from 'discord.js';
-import { EmbedBuilder } from '@discordjs/builders';
-import { embedColours } from '../../config/config';
+import { embedColours } from '../../globals';
 
 export abstract class SelectMenu {
     public abstract execute(

@@ -1,0 +1,19 @@
+client:
+  discordToken: ''
+  clientId: ''
+  guildId: ''
+  activityName: ''
+  loginRetry:
+    count: 5
+    intervalMs: 10000
+database:
+  path: "../../data/malbot.db"
+musicPlayer:
+  access_token: ''
+  refresh_token: ''
+  expiry_date: ''
+serverMonitor:
+  interval: 300
+  games:
+    - id: ''
+      name: ''

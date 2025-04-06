@@ -5,8 +5,8 @@
     "main": "index.js",
     "scripts": {
         "build": "tsc -b",
-        "start:dev": "ts-node src/index.ts",
-        "start:prod": "npm run build && node dist/index.js"
+        "start:dev": "cross-env NODE_ENV=dev ts-node src/index.ts",
+        "start:prod": "npm run build && cross-env NODE_ENV=prod node dist/index.js"
     },
     "repository": {
         "type": "git",
@@ -33,6 +33,7 @@
         "discord-player-youtubei": "^1.1.8",
         "discord.js": "^14.7.1",
         "gamedig": "^5.0.0",
+        "js-yaml": "^4.1.0",
         "mediaplex": "^0.0.9",
         "sequelize": "^6.29.3",
         "sqlite3": "^5.1.6",
@@ -42,6 +43,8 @@
         "ytdl-core": "^4.11.5"
     },
     "devDependencies": {
+        "@types/js-yaml": "^4.0.9",
+        "cross-env": "^7.0.3",
         "prettier": "^3.3.2"
     }
 }

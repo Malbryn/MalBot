@@ -1,3 +1,4 @@
+import { EmbedBuilder } from '@discordjs/builders';
 import {
     CommandInteraction,
     RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -6,8 +7,7 @@ import {
     SlashCommandOptionsOnlyBuilder,
     SlashCommandSubcommandsOnlyBuilder,
 } from 'discord.js';
-import { EmbedBuilder } from '@discordjs/builders';
-import { embedColours } from '../../config/config';
+import { embedColours } from '../../globals';
 
 export abstract class Command {
     protected slashCommandBuilder:

@@ -5,19 +5,18 @@ import {
     ModalSubmitInteraction,
     TextBasedChannel,
 } from 'discord.js';
+import { embedColours, logger } from '../../../globals';
+import { DatabaseService, ServerMonitoringService } from '../../../services';
+import { ServerInfo } from '../../../types';
 import { Modal } from '../modal';
-import { DatabaseService } from '../../../services/database.service';
-import { ServerMonitoringService } from '../../../services/server-monitoring.service';
-import { embedColours } from '../../../config/config';
-import { logger } from '../../../index';
-import { ServerInfo } from '../../../types/server-info.type';
 
 export class CreateServerMonitorModal extends Modal {
     static readonly NAME: string = 'create_server_modal';
+
     private static instance: CreateServerMonitorModal;
 
-    private databaseService: DatabaseService = DatabaseService.getInstance();
-    private serverMonitoringService: ServerMonitoringService =
+    private _databaseService: DatabaseService = DatabaseService.getInstance();
+    private _serverMonitoringService: ServerMonitoringService =
         ServerMonitoringService.getInstance();
 
     private constructor() {
@@ -66,7 +65,7 @@ export class CreateServerMonitorModal extends Modal {
             embeds: [embedBuilder],
         });
 
-        if (!this.serverMonitoringService.pendingGame) {
+        if (!this._serverMonitoringService.pendingGame) {
             logger.error('Pending game is undefined');
             return;
         }
@@ -80,7 +79,7 @@ export class CreateServerMonitorModal extends Modal {
             queryPort: Number.parseInt(
                 interaction.fields.getTextInputValue('queryPort'),
             ),
-            game: this.serverMonitoringService.pendingGame,
+            game: this._serverMonitoringService.pendingGame,
             password: interaction.fields.getTextInputValue('password'),
             modset: interaction.fields.getTextInputValue('modset'),
             channelId: message.channel.id,
@@ -88,13 +87,13 @@ export class CreateServerMonitorModal extends Modal {
             isRunning: true,
         };
 
-        await this.databaseService.saveServerInfo(serverInfo);
-        this.serverMonitoringService.resetPendingGame();
+        await this._databaseService.saveServerInfo(serverInfo);
+        this._serverMonitoringService.resetPendingGame();
 
-        if (this.serverMonitoringService.isRunning()) {
-            await this.serverMonitoringService.stop();
+        if (this._serverMonitoringService.isRunning()) {
+            await this._serverMonitoringService.stop();
         }
 
-        await this.serverMonitoringService.start();
+        await this._serverMonitoringService.start();
     }
 }

@@ -1,13 +1,14 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { embedColours } from '../../../globals';
+import { ServerMonitoringService } from '../../../services';
 import { Command } from '../command';
-import { ServerMonitoringService } from '../../../services/server-monitoring.service';
-import { embedColours } from '../../../config/config';
 
 export class StopServerMonitoringCommand extends Command {
     static readonly NAME: string = 'stop_server_monitoring';
+
     private static instance: StopServerMonitoringCommand;
 
-    private serverMonitoringService: ServerMonitoringService =
+    private _serverMonitoringService: ServerMonitoringService =
         ServerMonitoringService.getInstance();
 
     private constructor() {
@@ -34,7 +35,7 @@ export class StopServerMonitoringCommand extends Command {
     override async execute(
         interaction: ChatInputCommandInteraction,
     ): Promise<void> {
-        if (!this.serverMonitoringService.isRunning()) {
+        if (!this._serverMonitoringService.isRunning()) {
             return await this.sendSimpleReply(
                 interaction,
                 '⚠️ Server monitoring is not running',
@@ -42,7 +43,7 @@ export class StopServerMonitoringCommand extends Command {
             );
         }
 
-        await this.serverMonitoringService.stop();
+        await this._serverMonitoringService.stop();
         await this.sendSimpleReply(
             interaction,
             '📡 Server monitoring has been stopped',

@@ -18,13 +18,16 @@ import {
     SlashCommandBuilder,
     VoiceBasedChannel,
 } from 'discord.js';
+import { embedColours, logger } from '../../../globals';
+import { ConfigService } from '../../../services';
 import { Command } from '../command';
-import { logger } from '../../../index';
-import { config, embedColours } from '../../../config/config';
 
 export class PlayCommand extends Command {
     static readonly NAME: string = 'play';
+
     private static instance: PlayCommand;
+
+    private _configService: ConfigService = ConfigService.getInstance();
 
     private constructor() {
         super();
@@ -36,25 +39,6 @@ export class PlayCommand extends Command {
         }
 
         return PlayCommand.instance;
-    }
-
-    protected override initBuilder(): void {
-        if (this.slashCommandBuilder) return;
-
-        this.slashCommandBuilder = new SlashCommandBuilder()
-            .setName(PlayCommand.NAME)
-            .setDescription('Plays a song or playlist.')
-            .addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
-                subcommand
-                    .setName('song')
-                    .setDescription('Plays a song.')
-                    .addStringOption((option: SlashCommandStringOption) =>
-                        option
-                            .setName('query')
-                            .setDescription('Song URL or search keywords')
-                            .setRequired(true),
-                    ),
-            );
     }
 
     override async execute(
@@ -97,6 +81,25 @@ export class PlayCommand extends Command {
 
             await this.handleError(interaction, 'Failed to play song');
         }
+    }
+
+    protected override initBuilder(): void {
+        if (this.slashCommandBuilder) return;
+
+        this.slashCommandBuilder = new SlashCommandBuilder()
+            .setName(PlayCommand.NAME)
+            .setDescription('Plays a song or playlist.')
+            .addSubcommand((subcommand: SlashCommandSubcommandBuilder) =>
+                subcommand
+                    .setName('song')
+                    .setDescription('Plays a song.')
+                    .addStringOption((option: SlashCommandStringOption) =>
+                        option
+                            .setName('query')
+                            .setDescription('Song URL or search keywords')
+                            .setRequired(true),
+                    ),
+            );
     }
 
     private getUserVoiceChannel(
@@ -146,7 +149,9 @@ export class PlayCommand extends Command {
             leaveOnEnd: false,
         };
 
-        let queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
+        let queue: GuildQueue | null = player.nodes.get(
+            this._configService.get('client').guildId,
+        );
 
         if (!queue) {
             queue = player.nodes.create(guild, queueOptions);
