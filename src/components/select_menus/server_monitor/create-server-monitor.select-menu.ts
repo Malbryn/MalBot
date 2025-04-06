@@ -1,23 +1,24 @@
 import {
-    MessageInteractionMetadata,
-    StringSelectMenuInteraction,
-    TextInputStyle,
-} from 'discord.js';
-import {
     ActionRowBuilder,
     ModalActionRowComponentBuilder,
     ModalBuilder,
     TextInputBuilder,
 } from '@discordjs/builders';
+import {
+    MessageInteractionMetadata,
+    StringSelectMenuInteraction,
+    TextInputStyle,
+} from 'discord.js';
+import { logger } from '../../../globals';
+import { ServerMonitoringService } from '../../../services';
 import { SelectMenu } from '../select-menu';
-import { logger } from '../../../index';
-import { ServerMonitoringService } from '../../../services/server-monitoring.service';
 
 export class CreateServerMonitorSelectMenu extends SelectMenu {
     static readonly NAME: string = 'server_monitor_select_menu';
+
     private static instance: CreateServerMonitorSelectMenu;
 
-    private serverMonitoringService: ServerMonitoringService =
+    private _serverMonitoringService: ServerMonitoringService =
         ServerMonitoringService.getInstance();
 
     private constructor() {
@@ -41,7 +42,6 @@ export class CreateServerMonitorSelectMenu extends SelectMenu {
 
         if (!metadata) {
             logger.warn('Message interaction metadata is not found');
-
             return;
         }
 
@@ -49,12 +49,11 @@ export class CreateServerMonitorSelectMenu extends SelectMenu {
             logger.warn(
                 `Select menu user mismatch [Interaction owner: ${metadata.user.username}] [Interacting user: ${interaction.user.username}]`,
             );
-
             return;
         }
 
         const modal: ModalBuilder = this.createModal();
-        this.serverMonitoringService.pendingGame =
+        this._serverMonitoringService.pendingGame =
             interaction.values[0] ?? undefined;
 
         await interaction.showModal(modal);

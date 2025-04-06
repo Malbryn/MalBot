@@ -1,13 +1,16 @@
 import { SlashCommandIntegerOption } from '@discordjs/builders';
 import { GuildQueue, Player, useMainPlayer } from 'discord-player';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { logger } from '../../../globals';
+import { ConfigService } from '../../../services';
 import { Command } from '../command';
-import { config } from '../../../config/config';
-import { logger } from '../../../index';
 
 export class SeekCommand extends Command {
     static readonly NAME: string = 'seek';
+
     private static instance: SeekCommand;
+
+    private _configService: ConfigService = ConfigService.getInstance();
 
     private constructor() {
         super();
@@ -39,7 +42,9 @@ export class SeekCommand extends Command {
         interaction: ChatInputCommandInteraction,
     ): Promise<void> {
         const player: Player = useMainPlayer();
-        const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
+        const queue: GuildQueue | null = player.nodes.get(
+            this._configService.get('client').guildId,
+        );
 
         if (!queue) {
             return await this.handleError(interaction, 'Player queue is empty');

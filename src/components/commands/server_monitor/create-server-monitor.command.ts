@@ -6,13 +6,16 @@ import {
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
 } from 'discord.js';
+import { ConfigService } from '../../../services';
+import { Game } from '../../../types';
 import { Command } from '../command';
-import { config } from '../../../config/config';
-import { Game } from '../../../types/config.type';
 
 export class CreateServerMonitorCommand extends Command {
     static readonly NAME: string = 'create_server_info_panel';
+
     private static instance: CreateServerMonitorCommand;
+
+    private _configService: ConfigService = ConfigService.getInstance();
 
     private constructor() {
         super();
@@ -44,8 +47,9 @@ export class CreateServerMonitorCommand extends Command {
                 .setPlaceholder('Select a game')
                 .setMinValues(1)
                 .setMaxValues(1);
-
-        const gameOptions: Game[] = [...config.SERVER_MONITORING_GAMES];
+        const gameOptions: Game[] = [
+            ...this._configService.get('serverMonitor').games,
+        ];
 
         for (const gameOption of gameOptions) {
             selectMenu.addOptions(

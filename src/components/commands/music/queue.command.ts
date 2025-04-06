@@ -8,13 +8,16 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
 } from 'discord.js';
+import { embedColours, logger } from '../../../globals';
+import { ConfigService } from '../../../services';
 import { Command } from '../command';
-import { config, embedColours } from '../../../config/config';
-import { logger } from '../../../index';
 
 export class QueueCommand extends Command {
     static readonly NAME: string = 'queue';
+
     private static instance: QueueCommand;
+
+    private _configService: ConfigService = ConfigService.getInstance();
 
     private constructor() {
         super();
@@ -40,7 +43,9 @@ export class QueueCommand extends Command {
         interaction: ChatInputCommandInteraction,
     ): Promise<void> {
         const player: Player = useMainPlayer();
-        const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
+        const queue: GuildQueue | null = player.nodes.get(
+            this._configService.get('client').guildId,
+        );
 
         if (!queue) {
             return await this.handleError(interaction, 'Player queue is empty');

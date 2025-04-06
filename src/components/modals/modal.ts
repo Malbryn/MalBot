@@ -1,6 +1,6 @@
-import { ModalSubmitInteraction, RGBTuple } from 'discord.js';
 import { EmbedBuilder } from '@discordjs/builders';
-import { embedColours } from '../../config/config';
+import { ModalSubmitInteraction, RGBTuple } from 'discord.js';
+import { embedColours } from '../../globals';
 
 export abstract class Modal {
     public abstract execute(interaction: ModalSubmitInteraction): Promise<void>;

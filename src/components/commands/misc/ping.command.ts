@@ -4,9 +4,8 @@ import {
     Message,
     SlashCommandBuilder,
 } from 'discord.js';
+import { embedColours, logger } from '../../../globals';
 import { Command } from '../command';
-import { embedColours } from '../../../config/config';
-import { logger } from '../../../index';
 
 export class PingCommand extends Command {
     static readonly NAME: string = 'ping';

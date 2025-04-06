@@ -1,11 +1,14 @@
 import { GuildQueue, Player, useMainPlayer } from 'discord-player';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ConfigService } from '../../../services';
 import { Command } from '../command';
-import { config } from '../../../config/config';
 
 export class StopCommand extends Command {
     static readonly NAME: string = 'stop';
+
     private static instance: StopCommand;
+
+    private _configService: ConfigService = ConfigService.getInstance();
 
     private constructor() {
         super();
@@ -33,7 +36,9 @@ export class StopCommand extends Command {
         interaction: ChatInputCommandInteraction,
     ): Promise<void> {
         const player: Player = useMainPlayer();
-        const queue: GuildQueue | null = player.nodes.get(config.GUILD_ID);
+        const queue: GuildQueue | null = player.nodes.get(
+            this._configService.get('client').guildId,
+        );
 
         if (!queue) {
             return await this.handleError(interaction, 'Player queue is empty');
