@@ -1,4 +1,5 @@
 import { ActionRowBuilder } from '@discordjs/builders';
+import { PermissionFlagsBits } from 'discord-api-types/payloads/common';
 import {
     AnyComponentBuilder,
     ChatInputCommandInteraction,
@@ -35,7 +36,8 @@ export class CreateServerMonitorCommand extends Command {
 
         this.slashCommandBuilder = new SlashCommandBuilder()
             .setName(CreateServerMonitorCommand.NAME)
-            .setDescription('Creates the server info panel.');
+            .setDescription('Creates the server info panel.')
+            .setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
     }
 
     override async execute(
