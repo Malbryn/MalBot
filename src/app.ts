@@ -66,7 +66,7 @@ export class App {
                     `Failed to log in after (${this._configService.get('client').loginRetry.count}) attempts: ${error.message}`,
                 );
 
-                this.shutdown(1);
+                this.shutdown();
             });
     }
 
@@ -237,7 +237,7 @@ export class App {
         await selectMenu.execute(interaction);
     }
 
-    private shutdown(code: number): void {
+    private shutdown(code: number = 1): void {
         logger.warn(`Shutting down app [Code: ${code}]`);
 
         process.exit(code);
