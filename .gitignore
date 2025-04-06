@@ -129,8 +129,13 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Config
-config.json
+# Config files
+config/config.dev.json
+config.dev.json
+config.prod.json
+config.yml
+config.dev.yml
+config.prod.yml
 
 # Build scripts
 *.bat
