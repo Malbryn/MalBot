@@ -1,4 +1,3 @@
-import { PermissionFlagsBits } from 'discord-api-types/payloads/common';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { embedColours } from '../../../globals';
 import { ServerMonitoringService } from '../../../services';
@@ -31,7 +30,7 @@ export class StartServerMonitoringCommand extends Command {
         this.slashCommandBuilder = new SlashCommandBuilder()
             .setName(StartServerMonitoringCommand.NAME)
             .setDescription('Starts the game server monitoring.')
-            .setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
+            .setDefaultMemberPermissions(1 << 3);
     }
 
     override async execute(
