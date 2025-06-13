@@ -1,5 +1,5 @@
 # Stage 1
-FROM node:22 as builder
+FROM node:22 AS builder
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY config ./config
 RUN npm ci && npm run build
 
 # Stage 2
-FROM node:22 as runner
+FROM node:22 AS runner
 
 # Install FFmpeg
 RUN apt-get update && \
