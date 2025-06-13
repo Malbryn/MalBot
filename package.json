@@ -5,8 +5,9 @@
     "main": "index.js",
     "scripts": {
         "build": "tsc -b",
-        "start:dev": "cross-env NODE_ENV=dev ts-node src/index.ts",
-        "start:prod": "npm run build && cross-env NODE_ENV=prod node dist/index.js"
+        "serve:dev": "cross-env NODE_ENV=dev ts-node src/index.ts",
+        "serve:prod": "cross-env NODE_ENV=prod node dist/index.js",
+        "start": "npm run build && npm run serve:prod"
     },
     "repository": {
         "type": "git",
@@ -28,7 +29,8 @@
         "@discordjs/voice": "^0.18.0",
         "@types/gamedig": "^5.0.2",
         "@types/node": "^20.14.8",
-        "discord-api-types": "^0.37.35",
+        "cross-env": "^7.0.3",
+        "discord-api-types": "^0.38.11",
         "discord-player": "^6.0.0",
         "discord-player-youtubei": "^1.1.8",
         "discord.js": "^14.7.1",
@@ -44,6 +46,7 @@
     },
     "devDependencies": {
         "@types/js-yaml": "^4.0.9",
+        "bgutils-js": "^3.2.0",
         "cross-env": "^7.0.3",
         "prettier": "^3.3.2"
     }

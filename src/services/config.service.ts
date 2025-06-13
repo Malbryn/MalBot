@@ -28,7 +28,9 @@ export class ConfigService {
     }
 
     private initConfig(): Config {
-        logger.info('Initialising config service');
+        logger.info(
+            `Initialising config service [Config: ${this.CONFIG_FILE}]`,
+        );
 
         const configPath = path.join(
             __dirname,

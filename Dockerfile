@@ -27,4 +27,4 @@ COPY config ./config
 RUN npm install --omit=dev
 COPY --from=builder /app/dist/ dist/
 
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start"]
