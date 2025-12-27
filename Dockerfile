@@ -29,4 +29,4 @@ COPY package*.json ./
 RUN npm ci --only=production && \
     npm cache clean --force
 
-CMD ["npm", "run", "serve:prod"]
+CMD ["npm", "run", "start:prod"]
