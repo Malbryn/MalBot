@@ -1,9 +1,4 @@
-import {
-    SoundCloudExtractor,
-    SpotifyExtractor,
-} from '@discord-player/extractor';
-import { Player } from 'discord-player';
-import { YoutubeiExtractor } from 'discord-player-youtubei';
+import { Player, useMainPlayer } from 'discord-player';
 import {
     ActivityType,
     AnySelectMenuInteraction,
@@ -12,6 +7,7 @@ import {
     CommandInteraction,
     Events,
     GatewayIntentBits,
+    Guild,
     Interaction,
     InteractionType,
     ModalSubmitInteraction,
@@ -33,6 +29,8 @@ import {
     ServerMonitoringService,
 } from './services';
 import { retry } from './utils';
+import { YoutubeSabrExtractor } from 'discord-player-googlevideo';
+import { DefaultExtractors } from '@discord-player/extractor';
 
 export class App {
     static client: Client;
@@ -52,13 +50,15 @@ export class App {
         this.initEventListeners();
         await this.initMusicPlayer();
 
+        const discordToken = this._configService.get('client').discordToken;
+        const retryCount = this._configService.get('client').loginRetry.count;
+        const retryIntervalMs =
+            this._configService.get('client').loginRetry.intervalMs;
+
         await retry(
-            async () =>
-                await App.client.login(
-                    this._configService.get('client').discordToken,
-                ),
-            this._configService.get('client').loginRetry.count,
-            this._configService.get('client').loginRetry.intervalMs,
+            async () => await App.client.login(discordToken),
+            retryCount,
+            retryIntervalMs,
         )
             .then(() => logger.info('Login successful'))
             .catch((error) => {
@@ -108,11 +108,11 @@ export class App {
 
         const player: Player = new Player(App.client, {});
 
-        await player.extractors.register(YoutubeiExtractor, {
-            authentication: '',
-        });
-        await player.extractors.register(SpotifyExtractor, {});
-        await player.extractors.register(SoundCloudExtractor, {});
+        await player.extractors.register(YoutubeSabrExtractor, {});
+        await player.extractors.loadMulti([
+            ...DefaultExtractors,
+            YoutubeSabrExtractor,
+        ]);
     }
 
     private async initServices(): Promise<void> {
@@ -193,7 +193,20 @@ export class App {
         );
 
         await interaction.deferReply();
-        await command.execute(interaction);
+
+        const player: Player = useMainPlayer();
+        const guild: Guild | null = interaction.guild;
+
+        if (!guild) {
+            logger.warn(`Cannot provide Guild to player context`);
+
+            await command.execute(interaction);
+            return;
+        }
+
+        await player.context.provide({ guild }, () =>
+            command.execute(interaction),
+        );
     }
 
     private async handleModalSubmitInteraction(

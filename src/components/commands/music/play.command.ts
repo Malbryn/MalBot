@@ -197,7 +197,7 @@ export class PlayCommand extends Command {
             .setTitle(`**${track.title}**`)
             .setURL(track.url)
             .setColor(embedColours.INFO)
-            .setThumbnail(track.thumbnail)
+            .setThumbnail(track.thumbnail || null)
             .setAuthor({
                 name: '▶️ Added song to the queue',
             })
