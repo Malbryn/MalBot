@@ -7,7 +7,7 @@ client:
     count: 5
     intervalMs: 10000
 database:
-  path: "../../data/malbot.db"
+  path: '../../data/malbot.db'
 musicPlayer:
   access_token: ''
   refresh_token: ''
