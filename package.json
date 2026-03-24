@@ -32,7 +32,7 @@
     "discord-api-types": "^0.38.37",
     "discord-player": "^7.1.0",
     "discord-player-googlevideo": "^0.2.0",
-    "discord-player-youtubei": "^1.5.0",
+    "discord-player-youtubei": "^2.0.0",
     "discord.js": "^14.25.1",
     "gamedig": "^5.3.2",
     "js-yaml": "^4.1.1",
