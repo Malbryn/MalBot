@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM node:22 AS builder
+FROM node:26 AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ COPY config ./config
 RUN npm run build
 
 # Stage 2: Production
-FROM node:22 AS runner
+FROM node:26 AS runner
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ffmpeg && \
