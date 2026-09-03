@@ -5,8 +5,10 @@ export const version: string = process.env.npm_package_version ?? '0.0.0';
 export const environment: Environment =
   process.env.NODE_ENV === 'prod' ? 'prod' : 'dev';
 export const logger: Logger<unknown> = new Logger({
-  prettyLogTemplate: '{{dateIsoStr}} {{logLevelName}}\t',
   minLevel: environment === 'prod' ? 3 : 2, // 2 = debug, 3 = info
+  pretty: {
+    template: '{{dateIsoStr}} {{logLevelName}}\t',
+  },
 });
 export const embedColours: ColourPalette = {
   DEBUG: [87, 242, 135],

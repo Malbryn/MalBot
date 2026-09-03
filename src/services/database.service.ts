@@ -1,7 +1,7 @@
 import path from 'path';
 import { DataTypes, Model, ModelStatic, Sequelize } from 'sequelize';
-import { ServerInfo } from 'src/types/server-info.type';
 import { logger } from '../globals';
+import { ServerInfo } from '../types';
 import { ConfigService } from './config.service';
 
 export class DatabaseService {
